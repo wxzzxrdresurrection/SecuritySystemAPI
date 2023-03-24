@@ -14,15 +14,8 @@ export default class extends BaseSchema {
       table.string('telefono', 10).notNullable()
       table.enum('estatus', [1, 0]).defaultTo(0)
       table.string('codigo_verificacion', 10).nullable()
-      table
-        .bigInteger('rol_id')
-        .unsigned()
-        .references('id')
-        .inTable('roles')
-        .onDelete('CASCADE')
-        .onUpdate('CASCADE')
-      table.timestamp('created_at', { useTz: true })
-      table.timestamp('updated_at', { useTz: true })
+      table.integer('rol_id').unsigned().references('roles.id').onUpdate('CASCADE')
+      table.timestamps(true, true)
     })
   }
 

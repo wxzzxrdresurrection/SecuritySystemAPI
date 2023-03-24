@@ -43,7 +43,7 @@ const databaseConfig: DatabaseConfig = {
         database: Env.get('MYSQL_DB_NAME'),
       },
       migrations: {
-        naturalSort: false,
+        naturalSort: true,
       },
       healthCheck: false,
       debug: false,

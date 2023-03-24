@@ -15,7 +15,11 @@ export default class UsersController {
           rules.maxLength(120),
           rules.unique({ table: 'users', column: 'correo' }),
         ]),
-        telefono: schema.string([rules.minLength(10), rules.maxLength(10)]),
+        telefono: schema.string([
+          rules.minLength(10),
+          rules.maxLength(10),
+          rules.unique({ table: 'users', column: 'telefono' }),
+        ]),
         password: schema.string([rules.minLength(8), rules.maxLength(500), rules.trim()]),
       }),
       messages: {
@@ -44,6 +48,46 @@ export default class UsersController {
       message: 'Usuario registrado correctamente',
       error: null,
       data: user,
+    })
+  }
+
+  public async login({ request, response, auth }: HttpContextContract) {
+    await request.validate({
+      schema: schema.create({
+        correo_o_telefono: schema.string([rules.maxLength(120), rules.trim()]),
+        password: schema.string([rules.minLength(8), rules.maxLength(500), rules.trim()]),
+      }),
+      messages: {
+        required: 'El campo {{ field }} es obligatorio',
+        maxLength: 'El campo {{ field }} no puede tener más de {{ options.maxLength }} caracteres',
+        minLength:
+          'El campo {{ field }} no puede tener menos de {{ options.minLength }} caracteres',
+        trim: 'El campo { field } no debe contener espacios en blanco',
+      },
+    })
+
+    const user = await User.query()
+      .where('correo', request.input('correo_o_telefono'))
+      .orWhere('telefono', request.input('correo_o_telefono'))
+      .first()
+
+    if (!user || !(await Hash.verify(user.password, request.input('password')))) {
+      return response.status(404).created({
+        status: 404,
+        message: 'El usuario o la contraseña no es correcta',
+        error: null,
+        data: null,
+      })
+    }
+
+    const token = await auth.use('api').generate(user)
+
+    return response.status(200).created({
+      status: 200,
+      message: 'Usuario logueado correctamente',
+      error: null,
+      data: request.all(),
+      token: token,
     })
   }
 }
