@@ -80,6 +80,15 @@ export default class UsersController {
       })
     }
 
+    if (user.estatus === 0) {
+      return response.status(404).created({
+        status: 404,
+        message: 'Si deseas activar tu cuenta, contacte con un adminstrador',
+        error: 'Usuario desactivado',
+        data: null,
+      })
+    }
+
     const token = await auth.use('api').generate(user)
 
     return response.status(200).created({
