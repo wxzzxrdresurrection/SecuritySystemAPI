@@ -2,14 +2,49 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Hash from '@ioc:Adonis/Core/Hash'
 import User from 'App/Models/User'
+import InfoUser from 'App/Models/InfoUser'
 
 export default class UsersController {
-  public async registro({ request, response }: HttpContextContract) {
+  public async registrarInfoPersonal({request, response}:HttpContextContract){
     await request.validate({
       schema: schema.create({
         nombre: schema.string([rules.maxLength(100)]),
         ap_paterno: schema.string([rules.maxLength(60)]),
         ap_materno: schema.string([rules.maxLength(60)]),
+        sexo: schema.enum(['Masculino','Femenino']),
+        fecha_nacimiento: schema.date(),
+      })
+    })
+
+    const infoUser = await InfoUser.create({
+      nombre: request.input('nombre'),
+      ap_paterno: request.input('ap_paterno'),
+      ap_materno: request.input('ap_materno'),
+      sexo: request.input('sexo'),
+      fecha_nacimiento: request.input('fecha_nacimiento'),
+    })
+
+    if(!infoUser){
+      return response.status(400).json({
+        status: 400,
+        message: 'No se pudo registrar la información personal',
+        error: null,
+        data: null,
+      })
+    }
+
+    return response.status(201).json({
+      status: 201,
+      message: 'Información personal registrada correctamente',
+      error: null,
+      data: infoUser,
+    })
+
+  }
+
+  public async registro({ request, response }: HttpContextContract) {
+    await request.validate({
+      schema: schema.create({
         correo: schema.string([
           rules.email(),
           rules.maxLength(120),
@@ -35,9 +70,6 @@ export default class UsersController {
     })
 
     const user = await User.create({
-      nombre: request.input('nombre'),
-      ap_paterno: request.input('ap_paterno'),
-      ap_materno: request.input('ap_materno'),
       correo: request.input('correo'),
       telefono: request.input('telefono'),
       password: await Hash.make(request.input('password')),

@@ -1,18 +1,16 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'tiendas'
+  protected tableName = 'preguntas'
 
-  public async up() {
+  public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.string('nombre', 100).notNullable()
-      table.string('descripcion', 255).nullable()
-      table.timestamps(true, true)
+      table.string('pregunta', 500).notNullable()
     })
   }
 
-  public async down() {
+  public async down () {
     this.schema.dropTable(this.tableName)
   }
 }
