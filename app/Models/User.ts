@@ -6,7 +6,7 @@ export default class User extends BaseModel {
 
   @column({ isPrimary: true })
   public id: number
-  
+
   @column()
   public correo: string
 
@@ -15,6 +15,9 @@ export default class User extends BaseModel {
 
   @column()
   public telefono: string
+
+  @column()
+  public info_user_id: number
 
   @column()
   public estatus: number

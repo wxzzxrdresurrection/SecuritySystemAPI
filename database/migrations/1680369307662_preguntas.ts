@@ -7,6 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.string('pregunta', 500).notNullable()
+      table.timestamps(true,true)
     })
   }
 

@@ -12,8 +12,14 @@ export default class UsersController {
         ap_paterno: schema.string([rules.maxLength(60)]),
         ap_materno: schema.string([rules.maxLength(60)]),
         sexo: schema.enum(['Masculino','Femenino']),
-        fecha_nacimiento: schema.date(),
-      })
+        fecha_nacimiento: schema.date({format: 'yyyy-mm-dd'}),
+      }),
+      messages: {
+        required: 'El campo {{ field }} es obligatorio',
+        maxLength: 'El campo {{ field }} no puede tener más de {{ options.maxLength }} caracteres',
+        enum: 'El campo {{ field }} solo permite estas opciones: {{ options.choices }}',
+        'date.format': 'El campo {{ field }} debe ser un formato {{ options.format }}',
+      }
     })
 
     const infoUser = await InfoUser.create({
@@ -22,6 +28,7 @@ export default class UsersController {
       ap_materno: request.input('ap_materno'),
       sexo: request.input('sexo'),
       fecha_nacimiento: request.input('fecha_nacimiento'),
+      pregunta_id : request.input('pregunta_id'),
     })
 
     if(!infoUser){
@@ -56,6 +63,7 @@ export default class UsersController {
           rules.unique({ table: 'users', column: 'telefono' }),
         ]),
         password: schema.string([rules.minLength(8), rules.maxLength(500), rules.trim()]),
+        info_user_id: schema.number([rules.exists({ table: 'info_users', column: 'id' })]),
       }),
       messages: {
         required: 'El campo {{ field }} es obligatorio',
@@ -66,6 +74,7 @@ export default class UsersController {
         trim: 'El campo { field } no debe contener espacios en blanco',
         string: 'El campo {{ field }} debe ser un texto',
         unique: 'El campo { field } ya está en uso',
+        exists: 'El campo { field } no existe',
       },
     })
 
@@ -73,6 +82,7 @@ export default class UsersController {
       correo: request.input('correo'),
       telefono: request.input('telefono'),
       password: await Hash.make(request.input('password')),
+      info_user_id : request.input('info_user_id'),
     })
 
     return response.status(201).created({

@@ -1,0 +1,13 @@
+services:
+  db:
+    image: mysql:8.0.32
+    container_name: security_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: secursys
+      MYSQL_USER: lazz
+      MYSQL_PASSWORD: ultrauser
+    ports:
+      - 3306:3306
+    
