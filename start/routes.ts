@@ -27,3 +27,11 @@ Route.get('/', async () => {
 Route.post('/registro/info', 'UsersController.registrarInfoPersonal')
 Route.post('/registro/user', 'UsersController.registro')
 Route.post('/login', 'UsersController.login')
+
+Route.group(() => {
+  Route.get('/tiendas', 'TiendasController.getTiendas')
+  Route.post('/tienda', 'TiendasController.createTienda')
+  Route.get('/tiendas/:id', 'TiendasController.getTienda')
+  Route.put('/tiendas/:id', 'TiendasController.updateTienda')
+  Route.delete('/tiendas/:id', 'TiendasController.deleteTienda')
+})

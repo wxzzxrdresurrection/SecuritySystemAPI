@@ -10,4 +10,10 @@ services:
       MYSQL_PASSWORD: ultrauser
     ports:
       - 3306:3306
-    
+  mongo:
+    image: mongo:latest
+    container_name: security_mongo
+    restart: always
+    ports:
+      - 27017:27017
+

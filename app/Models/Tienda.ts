@@ -6,10 +6,16 @@ export default class Tienda extends BaseModel {
   public id: number
 
   @column()
+  public key: string
+
+  @column()
   public nombre: string
 
   @column()
-  public descripcion: string
+  public code:  number
+
+  @column()
+  public user_id: number
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

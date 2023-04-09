@@ -18,7 +18,7 @@ export default class InfoUser extends BaseModel {
   public sexo: string
 
   @column()
-  public fecha_nacimiento: DateTime
+  public fecha_nacimiento: string
 
   @column()
   public pregunta_id: number

@@ -23,6 +23,12 @@ export default class User extends BaseModel {
   public estatus: number
 
   @column()
+  public pregunta_id: number
+
+  @column()
+  public respuesta: string
+
+  @column()
   public codigo_verificacion: string
 
   @column()
