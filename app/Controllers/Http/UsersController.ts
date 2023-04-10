@@ -141,4 +141,46 @@ export default class UsersController {
       token: token,
     })
   }
+
+  public async logout({ auth, response }: HttpContextContract) {
+    await auth.use('api').revoke()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Sesión cerrada correctamente',
+      error: null,
+      data: null,
+    })
+  }
+
+  public async allUsers({response}: HttpContextContract){
+    const users = await User.all()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Usuarios obtenidos correctamente',
+      error: null,
+      data: users,
+    })
+  }
+
+  public async getUser({params, response}: HttpContextContract){
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Usuario obtenido correctamente',
+      error: null,
+      data: user,
+    })
+  }
 }

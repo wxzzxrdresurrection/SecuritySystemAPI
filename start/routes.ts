@@ -35,3 +35,8 @@ Route.group(() => {
   Route.put('/tiendas/:id', 'TiendasController.updateTienda')
   Route.delete('/tiendas/:id', 'TiendasController.deleteTienda')
 })
+
+Route.group(() => {
+  Route.get('/user/:id', 'UsersController.getUser')
+  Route.get('/users', 'UsersController.allUsers')
+})

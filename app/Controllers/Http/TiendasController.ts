@@ -26,7 +26,7 @@ export default class TiendasController {
         nombre: request.input('nombre'),
         code: Math.floor(Math.random() *9000 + 1000),
         user_id: request.input('user_id'),
-      })
+    })
 
       if(!newTienda || !tienda) {
         return response.status(400).json({
