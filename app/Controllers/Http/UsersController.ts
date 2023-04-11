@@ -3,8 +3,10 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Hash from '@ioc:Adonis/Core/Hash'
 import User from 'App/Models/User'
 import InfoUser from 'App/Models/InfoUser'
+import Pregunta from 'App/Models/Pregunta'
 
 export default class UsersController {
+  //CALADO
   public async registrarInfoPersonal({request, response}:HttpContextContract){
     await request.validate({
       schema: schema.create({
@@ -48,10 +50,14 @@ export default class UsersController {
     })
 
   }
-
+  //CALADO
   public async registro({ request, response }: HttpContextContract) {
     await request.validate({
       schema: schema.create({
+        username: schema.string([
+          rules.minLength(5),
+          rules.maxLength(50),
+        ]),
         correo: schema.string([
           rules.email(),
           rules.maxLength(120),
@@ -79,20 +85,21 @@ export default class UsersController {
     })
 
     const user = await User.create({
+      username: request.input('username'),
       correo: request.input('correo'),
       telefono: request.input('telefono'),
       password: await Hash.make(request.input('password')),
       info_user_id : request.input('info_user_id'),
     })
 
-    return response.status(201).created({
+    return response.status(201).json({
       status: 201,
       message: 'Usuario registrado correctamente',
       error: null,
       data: user,
     })
   }
-
+  //CALADO
   public async login({ request, response, auth }: HttpContextContract) {
     await request.validate({
       schema: schema.create({
@@ -114,7 +121,7 @@ export default class UsersController {
       .first()
 
     if (!user || !(await Hash.verify(user.password, request.input('password')))) {
-      return response.status(404).created({
+      return response.status(404).json({
         status: 404,
         message: 'El usuario o la contraseña no es correcta',
         error: null,
@@ -123,7 +130,7 @@ export default class UsersController {
     }
 
     if (user.estatus === 0) {
-      return response.status(404).created({
+      return response.status(404).json({
         status: 404,
         message: 'Si deseas activar tu cuenta, contacte con un adminstrador',
         error: 'Usuario desactivado',
@@ -133,7 +140,7 @@ export default class UsersController {
 
     const token = await auth.use('api').generate(user)
 
-    return response.status(200).created({
+    return response.status(200).json({
       status: 200,
       message: 'Usuario logueado correctamente',
       error: null,
@@ -141,7 +148,7 @@ export default class UsersController {
       token: token,
     })
   }
-
+  //CALADO
   public async logout({ auth, response }: HttpContextContract) {
     await auth.use('api').revoke()
 
@@ -152,9 +159,9 @@ export default class UsersController {
       data: null,
     })
   }
-
+  //CALADO
   public async allUsers({response}: HttpContextContract){
-    const users = await User.all()
+    const users = (await User.all()).reverse()
 
     return response.status(200).json({
       status: 200,
@@ -163,7 +170,7 @@ export default class UsersController {
       data: users,
     })
   }
-
+  //CALADO
   public async getUser({params, response}: HttpContextContract){
     const user = await User.find(params.id)
 
@@ -183,4 +190,102 @@ export default class UsersController {
       data: user,
     })
   }
+  //CALADO
+  public async getPreguntas({response}){
+    const preguntas = (await Pregunta.all()).reverse()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Preguntas obtenidas correctamente',
+      error: null,
+      data: preguntas,
+    })
+
+  }
+  //CALADO
+  public async getMods({response}){
+    const users = await User.query().where('rol_id', 2)
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Datos obtenidos correctamente',
+      error: null,
+      data: users
+    })
+
+  }
+  //CALADO
+  public async getNormalUsers({response}){
+    const users = await User.query().where('rol_id', 3)
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Usuarios obtenidos correctamente',
+      error: null,
+      data: users
+    })
+
+  }
+
+  public async verifyAvailableEmailAndPhone({request, response}: HttpContextContract){
+    schema.create({
+      correo: schema.string([
+        rules.email(),
+        rules.maxLength(120),
+      ]),
+      telefono: schema.string([
+        rules.maxLength(10),
+        rules.minLength(10),
+      ])
+    })
+
+      const user = await User.query()
+        .where('correo', request.input('correo'))
+        .orWhere('telefono', request.input('telefono'))
+        .first()
+
+      if(user){
+        return response.status(404).json({
+          status: 404,
+          message: 'El correo o el telefono ya están en uso',
+          error: null,
+          data: null,
+        })
+      }
+
+      return response.status(200).json({
+        status: 200,
+        message: 'El correo y el telefono están disponibles',
+        error: null,
+        data: null,
+      })
+
+  }
+
+  //CALADO
+  public async getMyInfo({auth, response}: HttpContextContract){
+
+    const user = await auth.use('api').authenticate()
+    const infoUser = await InfoUser.find(user.info_user_id)
+
+
+    if(!infoUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Usuario obtenido correctamente',
+      error: null,
+      data: infoUser,
+    })
+  }
+
+
+
 }
