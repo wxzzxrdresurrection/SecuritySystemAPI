@@ -12,6 +12,7 @@ export default class extends BaseSchema {
       table.enum('sexo',['Masculino','Femenino']).notNullable()
       table.date('fecha_nacimiento').notNullable()
       table.integer('pregunta_id').unsigned().references('preguntas.id').onUpdate('CASCADE')
+      table.string('respuesta', 100).notNullable()
       table.timestamps(true, true)
     })
   }

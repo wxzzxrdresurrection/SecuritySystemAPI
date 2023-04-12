@@ -31,6 +31,7 @@ export default class UsersController {
       sexo: request.input('sexo'),
       fecha_nacimiento: request.input('fecha_nacimiento'),
       pregunta_id : request.input('pregunta_id'),
+      respuesta: request.input('respuesta'),
     })
 
     if(!infoUser){

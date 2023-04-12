@@ -23,6 +23,9 @@ export default class InfoUser extends BaseModel {
   @column()
   public pregunta_id: number
 
+  @column()
+  public respuesta: string
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

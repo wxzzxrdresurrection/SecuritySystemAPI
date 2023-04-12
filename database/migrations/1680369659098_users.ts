@@ -13,7 +13,6 @@ export default class extends BaseSchema {
       table.integer('info_user_id').unsigned().references('info_users.id').onUpdate('CASCADE')
       table.enum('estatus', [1, 0]).defaultTo(0)
       table.string('codigo_verificacion', 10).nullable()
-      table.string('respuesta', 100).nullable()
       table.integer('rol_id').unsigned().references('roles.id').onUpdate('CASCADE').defaultTo(3)
       table.timestamps(true, true)
     })
