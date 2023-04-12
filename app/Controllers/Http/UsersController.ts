@@ -198,12 +198,14 @@ export default class UsersController {
   public async getPreguntas({response}){
     const preguntas = (await Pregunta.all()).reverse()
 
-    return response.status(200).json({
+    /*return response.status(200).json({
       status: 200,
       message: 'Preguntas obtenidas correctamente',
       error: null,
       data: preguntas,
-    })
+    })*/
+
+    return preguntas;
 
   }
   //CALADO
