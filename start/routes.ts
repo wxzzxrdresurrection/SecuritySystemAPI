@@ -45,4 +45,7 @@ Route.group(() => {
   Route.get('/users/mod', 'UsersController.getMods')
   Route.get('/users/normal', 'UsersController.getNormalUsers')
   Route.get('/users/info', 'UsersController.getMyInfo').middleware('auth')
+  Route.get('/users/info/:id', 'UsersController.getInfoUser')
+  Route.post('/registro/complete', 'UsersController.registroCompleto')
+
 })

@@ -308,4 +308,125 @@ export default class UsersController {
 
     return infoUser;
   }
+
+  public async registroCompleto({request, response}:HttpContextContract){
+
+    await request.validate({
+    schema: schema.create({
+      nombre: schema.string([
+        rules.maxLength(100)
+      ]),
+      ap_paterno: schema.string([
+        rules.maxLength(60)
+      ]),
+      ap_materno: schema.string([
+        rules.maxLength(60)
+      ]),
+      sexo: schema.string(),
+      fecha_nacimiento: schema.string(),
+      pregunta_id : schema.number(),
+      respuesta: schema.string([]),
+      username: schema.string([
+        rules.maxLength(50)
+      ]),
+      correo: schema.string([
+        rules.email(),
+        rules.maxLength(120),
+      ]),
+      password: schema.string([
+        rules.minLength(8),
+        rules.trim()
+      ]),
+      telefono: schema.string([
+        rules.maxLength(10),
+        rules.minLength(10),
+      ]),
+    }),
+    messages:{
+      required: 'El campo {{ field }} es requerido',
+      'correo.email': 'El correo no es válido',
+      maxLength: 'El campo {{ field }} no puede tener más de {{ options.length }} caracteres',
+      minLength: 'El campo {{ field }} no puede tener menos de {{ options.length }} caracteres',
+      number: 'El campo {{ field }} debe ser un número',
+      string: 'El campo {{ field }} debe ser una cadena de texto',
+      trim: 'El campo {{ field }} no puede tener espacios al inicio o al final',
+    }
+    })
+
+    const infoUser = InfoUser.create({
+      nombre: request.input('nombre'),
+      ap_paterno: request.input('ap_paterno'),
+      ap_materno: request.input('ap_materno'),
+      sexo: request.input('sexo'),
+      fecha_nacimiento: request.input('fecha_nacimiento'),
+      pregunta_id: request.input('pregunta_id'),
+      respuesta: request.input('respuesta'),
+    })
+
+    if(!infoUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Error al crear la informacion de usuario',
+        error: null,
+        data: null,
+      })
+    }
+
+    const user = await User.create({
+      username: request.input('username'),
+      correo: request.input('correo'),
+      password: await Hash.make(request.input('password')),
+      telefono: request.input('telefono'),
+      info_user_id: (await infoUser).id,
+    })
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Error al crear el usuario',
+        error: null,
+        data: null,
+      })
+    }
+
+    return response.status(201).json({
+      status: 201,
+      message: 'Usuario creado correctamente',
+      error: null,
+      user: user,
+      info: infoUser
+    })
+
+
+
+  }
+
+  public async getInfoUser({params, response}: HttpContextContract){
+
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const infoUser = await InfoUser.find(user.info_user_id)
+
+    if(!infoUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    return infoUser
+
+  }
+
 }
