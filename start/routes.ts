@@ -47,5 +47,6 @@ Route.group(() => {
   Route.get('/users/info', 'UsersController.getMyInfo').middleware('auth')
   Route.get('/users/info/:id', 'UsersController.getInfoUser')
   Route.post('/registro/complete', 'UsersController.registroCompleto')
+  Route.get('/verify/token', 'UsersController.verifyToken')
 
 })

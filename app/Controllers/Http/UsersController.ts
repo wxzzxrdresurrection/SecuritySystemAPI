@@ -400,7 +400,7 @@ export default class UsersController {
 
 
   }
-
+  //CALADO
   public async getInfoUser({params, response}: HttpContextContract){
 
     const user = await User.find(params.id)
@@ -426,6 +426,28 @@ export default class UsersController {
     }
 
     return infoUser
+
+  }
+
+  public async verifyToken({auth, response}: HttpContextContract){
+    const user = await auth.use('api').authenticate()
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Token válido',
+      error: null,
+      user_estatus: user.estatus,
+      user_rol: user.rol_id
+    })
 
   }
 
