@@ -6,6 +6,17 @@ import Hash from '@ioc:Adonis/Core/Hash'
 
 export default class extends BaseSeeder {
   public async run () {
+    await User.createMany([
+      {
+        "username" : "admin",
+        "correo" : "admin@gmail.com",
+        "telefono" : "8713530073",
+        "password" : await Hash.make('12345678'),
+        "estatus" : 1,
+        "rol_id" : 1,
+      }
+    ])
+
     await InfoUser.createMany([
       {
         "nombre" : "Luis Angel",

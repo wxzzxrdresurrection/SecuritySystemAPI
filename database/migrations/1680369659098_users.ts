@@ -10,7 +10,7 @@ export default class extends BaseSchema {
       table.string('correo', 120).notNullable().unique()
       table.string('password', 500).notNullable()
       table.string('telefono', 10).notNullable()
-      table.integer('info_user_id').unsigned().references('info_users.id').onUpdate('CASCADE')
+      table.integer('info_user_id').unsigned().references('info_users.id').onUpdate('CASCADE').nullable()
       table.enum('estatus', [1, 0]).defaultTo(0)
       table.string('codigo_verificacion', 10).nullable()
       table.integer('rol_id').unsigned().references('roles.id').onUpdate('CASCADE').defaultTo(3)
