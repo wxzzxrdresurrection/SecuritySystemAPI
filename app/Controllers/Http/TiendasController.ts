@@ -2,6 +2,8 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Tienda from 'App/Models/Tienda'
 import TiendaMongo from 'App/Models/TiendaMongo'
+import User from 'App/Models/User'
+import UserTienda from 'App/Models/UserTienda'
 
 export default class TiendasController {
   //CALADO
@@ -9,7 +11,7 @@ export default class TiendasController {
     await request.validate({
       schema: schema.create({
         nombre: schema.string([rules.maxLength(100)]),
-        user_id: schema.number([rules.required()]),
+        user_id: schema.number([rules.exists({ table: 'users', column: 'id' })]),
       }),
       messages: {
         required: 'El campo {{ field }} es obligatorio',
@@ -19,14 +21,12 @@ export default class TiendasController {
 
     const tienda = await Tienda.create({
       nombre: request.input('nombre'),
-      code: Math.floor(Math.random() * 9000 + 1000),
-      user_id: request.input('user_id'),
+      code: Math.floor(Math.random() * 9000 + 1000)
     })
 
     const newTienda = TiendaMongo.create({
         nombre: tienda.nombre,
         code: tienda.code,
-        user_id: tienda.user_id
     })
 
       if(!newTienda || !tienda) {
@@ -38,11 +38,19 @@ export default class TiendasController {
         })
       }
 
+    const user = await User.findOrFail(request.input('user_id'))
+
+    const tiendaUser = await UserTienda.create({
+      tienda_id: tienda.id,
+      user_id: user.id,
+      is_owner: true,
+    })
+
     return response.status(201).created({
       status: 201,
       message: 'Tienda creada correctamente',
       error: null,
-      data: tienda,
+      data: tiendaUser
     })
   }
   //CALADO
