@@ -51,6 +51,7 @@ export default class UsersController {
     })
 
   }
+
   //CALADO
   public async registro({ request, response }: HttpContextContract) {
     await request.validate({
@@ -100,6 +101,7 @@ export default class UsersController {
       data: user,
     })
   }
+
   //CALADO
   public async login({ request, response, auth }: HttpContextContract) {
     await request.validate({
@@ -152,6 +154,7 @@ export default class UsersController {
       token: token,
     })
   }
+
   //CALADO
   public async logout({ auth, response }: HttpContextContract) {
     await auth.use('api').revoke()
@@ -163,17 +166,21 @@ export default class UsersController {
       data: null,
     })
   }
+
   //CALADO
   public async allUsers({response}: HttpContextContract){
     const users = (await User.all()).reverse()
 
-    return response.status(200).json({
+    /*return response.status(200).json({
       status: 200,
       message: 'Usuarios obtenidos correctamente',
       error: null,
       data: users,
-    })
+    })*/
+
+    return users;
   }
+
   //CALADO
   public async getUser({params, response}: HttpContextContract){
     const user = await User.find(params.id)
@@ -187,13 +194,16 @@ export default class UsersController {
       })
     }
 
-    return response.status(200).json({
+    /*return response.status(200).json({
       status: 200,
       message: 'Usuario obtenido correctamente',
       error: null,
       data: user,
-    })
+    })*/
+
+    return user;
   }
+
   //CALADO
   public async getPreguntas({response}){
     const preguntas = (await Pregunta.all()).reverse()
@@ -208,31 +218,36 @@ export default class UsersController {
     return preguntas;
 
   }
+
   //CALADO
   public async getMods({response}){
     const users = await User.query().where('rol_id', 2)
 
-    return response.status(200).json({
+    /*return response.status(200).json({
       status: 200,
       message: 'Datos obtenidos correctamente',
       error: null,
       data: users
-    })
+    })*/
 
+    return users;
   }
+
   //CALADO
   public async getNormalUsers({response}){
     const users = await User.query().where('rol_id', 3)
 
-    return response.status(200).json({
+    /*return response.status(200).json({
       status: 200,
       message: 'Usuarios obtenidos correctamente',
       error: null,
       data: users
-    })
+    })*/
 
+    return users;
   }
 
+  //CALADO
   public async verifyAvailableEmailAndPhone({request, response}: HttpContextContract){
     schema.create({
       correo: schema.string([
@@ -284,14 +299,13 @@ export default class UsersController {
       })
     }
 
-    return response.status(200).json({
+    /*return response.status(200).json({
       status: 200,
       message: 'Usuario obtenido correctamente',
       error: null,
       data: infoUser,
-    })
+    })*/
+
+    return infoUser;
   }
-
-
-
 }
