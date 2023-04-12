@@ -146,6 +146,9 @@ export default class UsersController {
       message: 'Usuario logueado correctamente',
       error: null,
       data: request.all(),
+      id: user.id,
+      username: user.username,
+      role: user.rol_id,
       token: token,
     })
   }
