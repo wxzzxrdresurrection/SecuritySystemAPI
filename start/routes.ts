@@ -29,6 +29,7 @@ Route.post('/registro/user', 'UsersController.registro')
 Route.post('/login', 'UsersController.login')
 Route.get('/logout', 'UsersController.logout').middleware('auth')
 Route.get('/preguntas', 'UsersController.getPreguntas')
+Route.post('/verify/access', 'UsersController.verifyAvailableEmailAndPhone')
 
 Route.group(() => {
   Route.get('/tiendas', 'TiendasController.allTiendas')
