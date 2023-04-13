@@ -10,7 +10,7 @@ export default class extends BaseSchema {
       table.string('ap_paterno', 60).notNullable()
       table.string('ap_materno', 60).notNullable()
       table.enum('sexo',['Masculino','Femenino']).notNullable()
-      table.date('fecha_nacimiento').notNullable()
+      table.string('fecha_nacimiento').notNullable()
       table.integer('pregunta_id').unsigned().references('preguntas.id').onUpdate('CASCADE')
       table.string('respuesta', 100).notNullable()
       table.timestamps(true, true)
