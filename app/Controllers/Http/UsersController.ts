@@ -429,6 +429,7 @@ export default class UsersController {
 
   }
 
+  //CALADO
   public async verifyToken({auth, response}: HttpContextContract){
     const user = await auth.use('api').authenticate()
 
@@ -447,6 +448,107 @@ export default class UsersController {
       error: null,
       user_estatus: user.estatus,
       user_rol: user.rol_id
+    })
+
+  }
+
+  //CALADO
+  public async deleteUser({params, response}: HttpContextContract){
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const infoUser = await InfoUser.find(user.info_user_id)
+
+    if(!infoUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    await infoUser.delete()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Usuario eliminado correctamente',
+      error: null,
+      data: null,
+    })
+
+  }
+
+  //CALADO
+  public async updateUser({params ,request, response}: HttpContextContract){
+
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const infoUser = await InfoUser.find(user.info_user_id)
+
+    if(!infoUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const updatedInfoUser = await infoUser.merge({
+      nombre: request.input('nombre'),
+      ap_paterno: request.input('ap_paterno'),
+      ap_materno: request.input('ap_materno'),
+      sexo: request.input('sexo'),
+      fecha_nacimiento: request.input('fecha_nacimiento'),
+    }).save()
+
+    if(!updatedInfoUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Error al actualizar la información del usuario',
+        error: null,
+        data: null,
+      })
+    }
+
+    const updatedUser = await user.merge({
+      username: request.input('username'),
+      estatus: request.input('estatus'),
+      password: await Hash.make(request.input('password')),
+    }).save()
+
+    if(!updatedUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Error al actualizar el usuario',
+        error: null,
+        data: null,
+      })
+    }
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Usuario actualizado correctamente',
+      error: null,
+      data: null,
     })
 
   }
