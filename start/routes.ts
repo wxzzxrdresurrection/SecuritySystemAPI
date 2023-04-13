@@ -50,5 +50,6 @@ Route.group(() => {
   Route.get('/verify/token', 'UsersController.verifyToken')
   Route.delete('/users/:id', 'UsersController.deleteUser')
   Route.put('/users/:id', 'UsersController.updateUser')
-
+  Route.put('/users/password/:id', 'UsersController.updateUserPassword')
+  Route.put('/users/info/:id', 'UsersController.updateInfoUser')
 })
