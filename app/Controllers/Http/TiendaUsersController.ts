@@ -2,6 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import { schema } from '@ioc:Adonis/Core/Validator'
 import Tienda from 'App/Models/Tienda'
+import UserTienda from 'App/Models/UserTienda'
 
 export default class TiendaUsersController {
 
@@ -28,7 +29,7 @@ export default class TiendaUsersController {
       })
     }
 
-    const tienda = Tienda.find(request.input('codigo'))
+    const tienda = await Tienda.findBy('code',request.input('codigo'))
 
     if(!tienda){
       return response.status(404).json({
@@ -39,7 +40,27 @@ export default class TiendaUsersController {
       })
     }
 
-    const tiendas = user.tiendas
+    const tiendaUser = await UserTienda.create({
+      tienda_id: tienda?.id,
+      user_id: user.id,
+      is_owner: false,
+    })
+
+    if(!tiendaUser){
+      return response.status(400).json({
+        status: 400,
+        message: 'Error al agregar usuario a la tienda',
+        error: null,
+        data: null,
+      })
+    }
+
+    return response.status(201).json({
+      status: 201,
+      message: 'Usuario agregado a la tienda correctamente',
+      error: null,
+      data: tiendaUser
+    })
 
 
   }

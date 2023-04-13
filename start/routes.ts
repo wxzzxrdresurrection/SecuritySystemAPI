@@ -48,5 +48,5 @@ Route.group(() => {
   Route.get('/users/info/:id', 'UsersController.getInfoUser')
   Route.post('/registro/complete', 'UsersController.registroCompleto')
   Route.get('/verify/token', 'UsersController.verifyToken')
-
+  Route.post('/tienda/invite', 'TiendaUsersController.insertUser')
 })
