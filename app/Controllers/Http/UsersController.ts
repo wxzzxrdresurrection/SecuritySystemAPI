@@ -6,7 +6,8 @@ import InfoUser from 'App/Models/InfoUser'
 import Pregunta from 'App/Models/Pregunta'
 
 export default class UsersController {
-  //CALADO
+
+  //Login y Registro
   public async registrarInfoPersonal({request, response}:HttpContextContract){
     await request.validate({
       schema: schema.create({
@@ -52,7 +53,6 @@ export default class UsersController {
 
   }
 
-  //CALADO
   public async registro({ request, response }: HttpContextContract) {
     await request.validate({
       schema: schema.create({
@@ -102,7 +102,6 @@ export default class UsersController {
     })
   }
 
-  //CALADO
   public async login({ request, response, auth }: HttpContextContract) {
     await request.validate({
       schema: schema.create({
@@ -155,7 +154,6 @@ export default class UsersController {
     })
   }
 
-  //CALADO
   public async logout({ auth, response }: HttpContextContract) {
     await auth.use('api').revoke()
 
@@ -167,8 +165,9 @@ export default class UsersController {
     })
   }
 
+  //Usuarios
   //CALADO
-  public async allUsers({response}: HttpContextContract){
+  public async allUsers(){
     const users = (await User.all()).reverse()
 
     /*return response.status(200).json({
@@ -205,7 +204,7 @@ export default class UsersController {
   }
 
   //CALADO
-  public async getPreguntas({response}){
+  public async getPreguntas(){
     const preguntas = (await Pregunta.all()).reverse()
 
     /*return response.status(200).json({
@@ -220,7 +219,7 @@ export default class UsersController {
   }
 
   //CALADO
-  public async getMods({response}){
+  public async getMods(){
     const users = await User.query().where('rol_id', 2)
 
     /*return response.status(200).json({
@@ -234,7 +233,7 @@ export default class UsersController {
   }
 
   //CALADO
-  public async getNormalUsers({response}){
+  public async getNormalUsers(){
     const users = await User.query().where('rol_id', 3)
 
     /*return response.status(200).json({
@@ -309,6 +308,7 @@ export default class UsersController {
     return infoUser;
   }
 
+  //CALADO
   public async registroCompleto({request, response}:HttpContextContract){
 
     await request.validate({
@@ -400,6 +400,7 @@ export default class UsersController {
 
 
   }
+
   //CALADO
   public async getInfoUser({params, response}: HttpContextContract){
 
@@ -429,6 +430,7 @@ export default class UsersController {
 
   }
 
+  //CALADO
   public async verifyToken({auth, response}: HttpContextContract){
     const user = await auth.use('api').authenticate()
 
@@ -451,4 +453,201 @@ export default class UsersController {
 
   }
 
+  //CALADO
+  public async deleteUser({params, response}: HttpContextContract){
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const infoUser = await InfoUser.find(user.info_user_id)
+
+    if(!infoUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    await user.delete()
+    await infoUser.delete()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Usuario eliminado correctamente',
+      error: null,
+      data: null,
+    })
+
+  }
+
+  public async deleteMod({params, response}: HttpContextContract){
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    await user.delete()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Usuario eliminado correctamente',
+      error: null,
+      data: null,
+    })
+
+  }
+
+  //CALADO
+  public async updateUser({params ,request, response}: HttpContextContract){
+
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const updatedUser = await user.merge({
+      username: request.input('username'),
+      estatus: request.input('estatus'),
+      //password: await Hash.make(request.input('password')),
+    }).save()
+
+    if(!updatedUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Error al actualizar el usuario',
+        error: null,
+        data: null,
+      })
+    }
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Usuario actualizado correctamente',
+      error: null,
+      data: null,
+    })
+  }
+
+  //CALADO
+  public async updateUserPassword({params ,request, response}: HttpContextContract){
+
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const updatedUser = await user.merge({
+      password: await Hash.make(request.input('password')),
+    }).save()
+
+    if(!updatedUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Error al actualizar el usuario',
+        error: null,
+        data: null,
+      })
+    }
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Usuario actualizado correctamente',
+      error: null,
+      data: null,
+    })
+  }
+
+  //CALADO
+  public async updateInfoUser({params ,request, response}: HttpContextContract){
+
+    const infoUser = await InfoUser.find(params.id)
+
+    if(!infoUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const updatedInfoUser = await infoUser.merge({
+      nombre: request.input('nombre'),
+      ap_paterno: request.input('ap_paterno'),
+      ap_materno: request.input('ap_materno'),
+      sexo: request.input('sexo'),
+      fecha_nacimiento: request.input('fecha_nacimiento'),
+    }).save()
+
+    if(!updatedInfoUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Error al actualizar la información del usuario',
+        error: null,
+        data: null,
+      })
+    }
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Informacion de Usuario actualizada correctamente',
+      error: null,
+      data: null,
+    })
+  }
+
+  public async addUserModerador({request, response}: HttpContextContract){
+
+      const user = await User.create({
+        username: request.input('username'),
+        correo: request.input('correo'),
+        password: await Hash.make(request.input('password')),
+        telefono: request.input('telefono'),
+        rol_id: 2,
+        estatus: 2,
+      })
+  
+      if(!user){
+        return response.status(404).json({
+          status: 404,
+          message: 'Error al crear el usuario',
+          error: null,
+          data: null,
+        })
+      }
+  
+      return response.status(201).json({
+        status: 201,
+        message: 'Usuario creado correctamente',
+        error: null,
+        user: user,
+      })
+  }
 }
