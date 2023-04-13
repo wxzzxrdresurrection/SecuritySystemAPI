@@ -37,6 +37,7 @@ Route.group(() => {
   Route.get('/tienda/:id', 'TiendasController.getTienda')
   Route.put('/tiendas/:id', 'TiendasController.updateTienda')
   Route.delete('/tiendas/:id', 'TiendasController.deleteTienda')
+  Route.post('/tienda/invite', 'TiendaUsersController.insertUser')
 })
 
 Route.group(() => {
@@ -48,11 +49,17 @@ Route.group(() => {
   Route.get('/users/info/:id', 'UsersController.getInfoUser')
   Route.post('/registro/complete', 'UsersController.registroCompleto')
   Route.get('/verify/token', 'UsersController.verifyToken')
-  Route.post('/tienda/invite', 'TiendaUsersController.insertUser')
   Route.delete('/users/:id', 'UsersController.deleteUser')
   Route.put('/users/:id', 'UsersController.updateUser')
   Route.put('/users/password/:id', 'UsersController.updateUserPassword')
   Route.put('/users/info/:id', 'UsersController.updateInfoUser')
   Route.post('/users/mod', 'UsersController.addUserModerador')
   Route.delete('/users/mod/:id', 'UsersController.deleteMod')
+})
+
+
+Route.group(() => {
+  Route.post('/peticion', 'PeticionesController.createPeticion')
+  Route.get('/peticiones', 'PeticionesController.getPeticiones')
+  Route.put('/peticion/status/:id', 'PeticionesController.statusPeticion')
 })

@@ -633,7 +633,7 @@ export default class UsersController {
         rol_id: 2,
         estatus: 2,
       })
-  
+
       if(!user){
         return response.status(404).json({
           status: 404,
@@ -642,7 +642,7 @@ export default class UsersController {
           data: null,
         })
       }
-  
+
       return response.status(201).json({
         status: 201,
         message: 'Usuario creado correctamente',
@@ -650,4 +650,5 @@ export default class UsersController {
         user: user,
       })
   }
+
 }
