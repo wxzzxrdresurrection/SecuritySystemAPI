@@ -17,6 +17,17 @@ export default class extends BaseSeeder {
       }
     ])
 
+    await User.createMany([
+      {
+        "username" : "Moderador",
+        "correo" : "moderador@gmail.com",
+        "telefono" : "8713814000",
+        "password" : await Hash.make('moderador'),
+        "estatus" : 2,
+        "rol_id" : 2,
+      }
+    ])
+
     await InfoUser.createMany([
       {
         "nombre" : "Luis Angel",

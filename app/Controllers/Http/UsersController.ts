@@ -6,7 +6,8 @@ import InfoUser from 'App/Models/InfoUser'
 import Pregunta from 'App/Models/Pregunta'
 
 export default class UsersController {
-  //CALADO
+
+  //Login y Registro
   public async registrarInfoPersonal({request, response}:HttpContextContract){
     await request.validate({
       schema: schema.create({
@@ -52,7 +53,6 @@ export default class UsersController {
 
   }
 
-  //CALADO
   public async registro({ request, response }: HttpContextContract) {
     await request.validate({
       schema: schema.create({
@@ -102,7 +102,6 @@ export default class UsersController {
     })
   }
 
-  //CALADO
   public async login({ request, response, auth }: HttpContextContract) {
     await request.validate({
       schema: schema.create({
@@ -155,7 +154,6 @@ export default class UsersController {
     })
   }
 
-  //CALADO
   public async logout({ auth, response }: HttpContextContract) {
     await auth.use('api').revoke()
 
@@ -167,6 +165,7 @@ export default class UsersController {
     })
   }
 
+  //Usuarios
   //CALADO
   public async allUsers(){
     const users = (await User.all()).reverse()
@@ -401,7 +400,7 @@ export default class UsersController {
 
 
   }
-  
+
   //CALADO
   public async getInfoUser({params, response}: HttpContextContract){
 
@@ -480,6 +479,29 @@ export default class UsersController {
 
     await user.delete()
     await infoUser.delete()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Usuario eliminado correctamente',
+      error: null,
+      data: null,
+    })
+
+  }
+
+  public async deleteMod({params, response}: HttpContextContract){
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    await user.delete()
 
     return response.status(200).json({
       status: 200,
@@ -599,5 +621,33 @@ export default class UsersController {
       error: null,
       data: null,
     })
+  }
+
+  public async addUserModerador({request, response}: HttpContextContract){
+
+      const user = await User.create({
+        username: request.input('username'),
+        correo: request.input('correo'),
+        password: await Hash.make(request.input('password')),
+        telefono: request.input('telefono'),
+        rol_id: 2,
+        estatus: 2,
+      })
+  
+      if(!user){
+        return response.status(404).json({
+          status: 404,
+          message: 'Error al crear el usuario',
+          error: null,
+          data: null,
+        })
+      }
+  
+      return response.status(201).json({
+        status: 201,
+        message: 'Usuario creado correctamente',
+        error: null,
+        user: user,
+      })
   }
 }

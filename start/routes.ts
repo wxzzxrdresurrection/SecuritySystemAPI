@@ -52,4 +52,6 @@ Route.group(() => {
   Route.put('/users/:id', 'UsersController.updateUser')
   Route.put('/users/password/:id', 'UsersController.updateUserPassword')
   Route.put('/users/info/:id', 'UsersController.updateInfoUser')
+  Route.post('/users/mod', 'UsersController.addUserModerador')
+  Route.delete('/users/mod/:id', 'UsersController.deleteMod')
 })
