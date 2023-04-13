@@ -63,3 +63,9 @@ Route.group(() => {
   Route.get('/peticiones', 'PeticionesController.getPeticiones')
   Route.put('/peticion/status/:id', 'PeticionesController.statusPeticion')
 })
+
+Route.group(() => {
+  Route.post('/invitacion', 'InvitacionesController.sendInvitacion')
+  Route.get('/invitaciones/:id', 'InvitacionesController.misInvitaciones')
+  Route.post('/invitacion/process', 'InvitacionesController.procesarInvitacion')
+})
