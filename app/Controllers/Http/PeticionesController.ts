@@ -75,25 +75,18 @@ export default class PeticionesController {
       })
     }
 
-    const peticionUpdated = await peticion.merge({
-      estado: request.input('estado'),
-    })
+    peticion.estado = request.input('estado')
 
-    if(!peticionUpdated){
-      return response.status(400).json({
-        status: 400,
-        message: 'Error al actualizar la peticion',
+    if(await peticion.save()){
+      return response.status(200).json({
+        status: 200,
+        message: 'Peticion actualizada correctamente',
         error: null,
-        data: null,
+        data: peticion,
       })
     }
 
-    return response.status(200).json({
-      status: 200,
-      message: 'Peticion actualizada correctamente',
-      error: null,
-      data: peticionUpdated,
-    })
+
 
 
   }
