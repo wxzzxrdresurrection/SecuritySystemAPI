@@ -39,7 +39,8 @@ export default class PeticionesController {
   }
 
   public async getPeticiones({response} : HttpContextContract){
-    const peticiones = await (await Peticione.all()).reverse()
+    const peticiones = await (await Peticione.all()).reverse().filter(peticion => peticion.estado === null);
+
 
     if(!peticiones){
       return response.status(400).json({
@@ -55,6 +56,9 @@ export default class PeticionesController {
 
   public async statusPeticion({request, params, response} : HttpContextContract){
     const peticion = await Peticione.find(params.id)
+
+    console.log(peticion?.$attributes.user_id)
+    console.log(request.input('estado'))
 
     await request.validate({
       schema: schema.create({

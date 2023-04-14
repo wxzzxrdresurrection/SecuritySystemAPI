@@ -12,7 +12,7 @@ export default class extends BaseSeeder {
         "correo" : "admin@gmail.com",
         "telefono" : "8713530073",
         "password" : await Hash.make('12345678'),
-        "estatus" : 2,
+        "estatus" : 3,
         "rol_id" : 1,
       }
     ])
@@ -23,7 +23,7 @@ export default class extends BaseSeeder {
         "correo" : "moderador@gmail.com",
         "telefono" : "8713814000",
         "password" : await Hash.make('moderador'),
-        "estatus" : 2,
+        "estatus" : 3,
         "rol_id" : 2,
       }
     ])
@@ -46,7 +46,7 @@ export default class extends BaseSeeder {
         "correo" : "luiszapata0815@gmail.com",
         "telefono" : "8713530073",
         "password" : await Hash.make('Luis200315'),
-        "estatus" : 2,
+        "estatus" : 3,
         "info_user_id" : 1
       }
     ])
