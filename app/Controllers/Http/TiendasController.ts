@@ -25,6 +25,7 @@ export default class TiendasController {
     })
 
     const newTienda = TiendaMongo.create({
+        _id: tienda.id,
         nombre: tienda.nombre,
         code: tienda.code,
     })
@@ -88,5 +89,61 @@ export default class TiendasController {
     })*/
 
     return tienda;
+  }
+
+  public async updateTienda({ params, request, response }: HttpContextContract) {
+    const tienda = await Tienda.find(params.id)
+
+    if (!tienda) {
+      return response.status(404).json({
+        status: 404,
+        message: 'Tienda no encontrada',
+        error: null,
+        data: null,
+      })
+    }
+
+    await request.validate({
+      schema: schema.create({
+        nombre: schema.string([rules.maxLength(100)]),
+      }),
+      messages: {
+        required: 'El campo {{ field }} es obligatorio',
+        maxLength: 'El campo {{ field }} no puede tener más de {{ options.maxLength }} caracteres',
+      },
+    })
+
+    tienda.nombre = request.input('nombre')
+
+    await tienda.save()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Tienda actualizada correctamente',
+      error: null,
+      data: tienda,
+    })
+  }
+
+  public async deleteTienda({ params, response }: HttpContextContract) {
+    const tienda = await Tienda.find(params.id)
+
+    if (!tienda) {
+      return response.status(404).json({
+        status: 404,
+        message: 'Tienda no encontrada',
+        error: null,
+        data: null,
+      })
+    }
+
+    await tienda.delete()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Tienda eliminada correctamente',
+      error: null,
+      data: null,
+    })
   }
 }
