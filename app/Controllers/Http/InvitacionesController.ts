@@ -4,6 +4,7 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { DateTime } from 'luxon'
 import UserTienda from 'App/Models/UserTienda'
 
+
 export default class InvitacionesController {
 
   public async sendInvitacion({request, response}: HttpContextContract) {

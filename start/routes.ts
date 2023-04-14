@@ -37,7 +37,11 @@ Route.group(() => {
   Route.get('/tienda/:id', 'TiendasController.getTienda')
   Route.put('/tiendas/:id', 'TiendasController.updateTienda')
   Route.delete('/tiendas/:id', 'TiendasController.deleteTienda')
+
   Route.post('/tienda/invite', 'TiendaUsersController.insertUser')
+  Route.get('/tiendas/invitados/:id', 'TiendaUsersController.getInvitaciones')
+  Route.post('/tiendas/invitado', 'TiendaUsersController.addInvitado')
+  Route.delete('/tiendas/invitados/:id', 'TiendaUsersController.deleteInvitados')
 })
 
 Route.group(() => {
