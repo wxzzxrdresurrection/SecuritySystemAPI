@@ -143,7 +143,4 @@ export default class InvitacionesController {
 
 
   }
-
 }
-
-

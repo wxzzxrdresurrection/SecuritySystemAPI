@@ -53,16 +53,19 @@ export default class TiendasController {
       data: tiendaUser
     })
   }
+
   //CALADO
-  public async allTiendas({ response }: HttpContextContract) {
+  public async allTiendas() {
     const tiendas = (await Tienda.all()).reverse()
 
-    return response.status(200).json({
+    /*return response.status(200).json({
       status: 200,
       message: 'Tiendas obtenidas correctamente',
       error: null,
       data: tiendas,
-    })
+    })*/
+
+    return tiendas;
   }
 
   public async getTienda({ params, response }: HttpContextContract) {
@@ -77,11 +80,13 @@ export default class TiendasController {
       })
     }
 
-    return response.status(200).json({
+    /*return response.status(200).json({
       status: 200,
       message: 'Tienda obtenida correctamente',
       error: null,
       data: tienda,
-    })
+    })*/
+
+    return tienda;
   }
 }

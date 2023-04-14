@@ -57,7 +57,6 @@ Route.group(() => {
   Route.delete('/users/mod/:id', 'UsersController.deleteMod')
 })
 
-
 Route.group(() => {
   Route.post('/peticion', 'PeticionesController.createPeticion')
   Route.get('/peticiones', 'PeticionesController.getPeticiones')
