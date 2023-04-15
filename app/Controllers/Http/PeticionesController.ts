@@ -2,6 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Peticione from 'App/Models/Peticione'
 import { schema } from '@ioc:Adonis/Core/Validator'
 import { DateTime } from 'luxon'
+import User from 'App/Models/User'
 
 export default class PeticionesController {
   public async createPeticion({request, response} : HttpContextContract){
@@ -57,9 +58,6 @@ export default class PeticionesController {
   public async statusPeticion({request, params, response} : HttpContextContract){
     const peticion = await Peticione.find(params.id)
 
-    console.log(peticion?.$attributes.user_id)
-    console.log(request.input('estado'))
-
     await request.validate({
       schema: schema.create({
         estado : schema.boolean(),
@@ -78,6 +76,33 @@ export default class PeticionesController {
     peticion.estado = request.input('estado')
 
     if(await peticion.save()){
+      if (peticion.estado == true)
+      {
+        const user = await User.find(peticion.user_id)
+
+        if(!user){
+          return response.status(400).json({
+            status: 400,
+            message: 'Error al obtener el usuario',
+            error: null,
+            data: null,
+          })
+        }
+
+        const updatedUser = await user.merge({
+          estatus: 3
+        }).save()
+
+        if(!updatedUser){
+          return response.status(400).json({
+            status: 400,
+            message: 'Error al actualizar el usuario',
+            error: null,
+            data: null,
+          })
+        }
+      }
+
       return response.status(200).json({
         status: 200,
         message: 'Peticion actualizada correctamente',
@@ -85,9 +110,5 @@ export default class PeticionesController {
         data: peticion,
       })
     }
-
-
-
-
   }
 }

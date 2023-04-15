@@ -650,5 +650,4 @@ export default class UsersController {
         user: user,
       })
   }
-
 }
