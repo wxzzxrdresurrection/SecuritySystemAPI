@@ -24,7 +24,7 @@ export default class TiendasController {
       code: Math.floor(Math.random() * 9000 + 1000)
     })
 
-    const newTienda = TiendaMongo.create({
+    /*const newTienda = TiendaMongo.create({
         _id: tienda.id,
         nombre: tienda.nombre,
         code: tienda.code,
@@ -37,7 +37,7 @@ export default class TiendasController {
           error: null,
           data: null,
         })
-      }
+      }*/
 
     const user = await User.findOrFail(request.input('user_id'))
 

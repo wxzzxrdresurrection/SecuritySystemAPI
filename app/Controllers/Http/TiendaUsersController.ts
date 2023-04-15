@@ -80,6 +80,21 @@ export default class TiendaUsersController {
     return invitados;
   }
 
+  public async getOwners({response}: HttpContextContract){
+    const owners = await UserTienda.query().where('is_owner', true)
+
+    if(!owners){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: 'Usuario no encontrado',
+        data: null
+      })
+    }
+
+    return owners;
+  }
+
   public async addInvitado({request, response}: HttpContextContract){
     await request.validate({
       schema: schema.create({
