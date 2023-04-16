@@ -7,7 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.integer('user_id').unsigned().references('users.id').onUpdate('CASCADE')
-      table.integer('tienda_id').unsigned().references('tiendas.id').onUpdate('CASCADE')
+      table.integer('tienda_id').unsigned().references('tiendas.id')
       table.boolean('is_owner').defaultTo(false)
       table.timestamps(true, true)
     })
