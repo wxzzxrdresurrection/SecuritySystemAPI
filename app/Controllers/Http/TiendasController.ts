@@ -80,6 +80,19 @@ export default class TiendasController {
       })
     }
 
+    const tiendaUser = await UserTienda.query().where('is_owner', true).andWhere('tienda_id', tienda.id).first();
+
+    if (!tiendaUser) {
+      return response.status(404).json({
+        status: 404,
+        message: 'Tienda no encontrada',
+        error: null,
+        data: null,
+      })
+    }
+
+    const data = {nombre: tienda.nombre, user_id: tiendaUser.user_id}
+
     /*return response.status(200).json({
       status: 200,
       message: 'Tienda obtenida correctamente',
@@ -87,10 +100,22 @@ export default class TiendasController {
       data: tienda,
     })*/
 
-    return tienda;
+    return data;
   }
 
   public async updateTienda({ params, request, response }: HttpContextContract) {
+    await request.validate({
+      schema: schema.create({
+        nombre: schema.string([rules.maxLength(100)]),
+        user_id: schema.number([rules.exists({ table: 'users', column: 'id' })]),
+      }),
+      messages: {
+        required: 'El campo {{ field }} es obligatorio',
+        maxLength: 'El campo {{ field }} no puede tener más de {{ options.maxLength }} caracteres',
+        exists: 'El campo {{ field }} no existe',
+      },
+    })
+
     const tienda = await Tienda.find(params.id)
 
     if (!tienda) {
@@ -102,18 +127,21 @@ export default class TiendasController {
       })
     }
 
-    await request.validate({
-      schema: schema.create({
-        nombre: schema.string([rules.maxLength(100)]),
-      }),
-      messages: {
-        required: 'El campo {{ field }} es obligatorio',
-        maxLength: 'El campo {{ field }} no puede tener más de {{ options.maxLength }} caracteres',
-      },
-    })
+    const tiendaUser = await UserTienda.query().where('is_owner', true).andWhere('tienda_id', tienda.id).first();
+
+    if (!tiendaUser) {
+      return response.status(404).json({
+        status: 404,
+        message: 'Propietario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    tiendaUser.user_id = request.input('user_id')
+    await tiendaUser.save()
 
     tienda.nombre = request.input('nombre')
-
     await tienda.save()
 
     return response.status(200).json({
