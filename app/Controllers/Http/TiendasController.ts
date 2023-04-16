@@ -144,6 +144,12 @@ export default class TiendasController {
     tienda.nombre = request.input('nombre')
     await tienda.save()
 
+    const sameTiendaUser = await UserTienda.query().where('is_owner', false).andWhere('tienda_id', tienda.id).andWhere('user_id', tiendaUser.user_id).first();
+
+    if (sameTiendaUser) {
+      await sameTiendaUser.delete()
+    }
+
     return response.status(200).json({
       status: 200,
       message: 'Tienda actualizada correctamente',
