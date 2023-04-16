@@ -44,6 +44,7 @@ Route.group(() => {
   Route.get('/tiendas/invitados/owners', 'TiendaUsersController.getOwners')
   Route.post('/tiendas/invitado', 'TiendaUsersController.addInvitado')
   Route.put('/tiendas/invitados/:id', 'TiendaUsersController.deleteInvitados').where('id', '[0-9]+')
+  Route.get('/tiendas/invitados/owner/:id', 'TiendaUsersController.getGuests').where('id', '[0-9]+')
 })
 
 Route.group(() => {
@@ -73,4 +74,10 @@ Route.group(() => {
   Route.post('/invitacion', 'InvitacionesController.sendInvitacion')
   Route.get('/invitaciones/:id', 'InvitacionesController.misInvitaciones').where('id', '[0-9]+')
   Route.post('/invitacion/process', 'InvitacionesController.procesarInvitacion')
+})
+
+Route.group(() => {
+  Route.get('/sensores', 'SensorsController.allSensores')
+  Route.get('/tienda/sensores/:id', 'SensorsController.getTiendaSensores')
+  Route.post('/show/sensores', 'SensorsController.showSensores')
 })

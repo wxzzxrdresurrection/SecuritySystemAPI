@@ -198,6 +198,22 @@ export default class TiendaUsersController {
       data: null
     })
   }
+
+  public async getGuests({params, response} :HttpContextContract){
+
+    const owners = await UserTienda.query().where('is_owner', false).andWhere('id', params.id)
+
+    if(!owners){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: 'Usuario no encontrado',
+        data: null
+      })
+    }
+
+    return owners;
+  }
 }
 
 

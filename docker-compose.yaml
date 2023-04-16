@@ -10,6 +10,7 @@ services:
       MYSQL_PASSWORD: ultrauser
     ports:
       - 3306:3306
+
   mongo:
     image: mongo:latest
     container_name: security_mongo
@@ -18,5 +19,47 @@ services:
       - 27017:27017
     environment:
       MONGO_INITDB_DATABASE: secursys
+
+
+  # mongo1:
+  #   hostname: mongo1
+  #   container_name: localmongo1
+  #   build: .
+  #   expose:
+  #     - 27017
+  #   ports:
+  #     - 27017:27017
+  #   restart: always
+  #   entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  #   environment:
+  #     MONGO_INITDB_DATABASE: secursys
+  # mongo2:
+  #   hostname: mongo2
+  #   container_name: localmongo2
+  #   build: .
+  #   expose:
+  #     - 27017
+  #   ports:
+  #     - 27018:27017
+  #   restart: always
+  #   entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  # mongo3:
+  #   hostname: mongo3
+  #   container_name: localmongo3
+  #   build: .
+  #   expose:
+  #     - 27017
+  #   ports:
+  #     - 27019:27017
+  #   restart: always
+  #   entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  # arbiter:
+  #   hostname: arbiter
+  #   container_name: arbiter
+  #   build: .
+  #   expose:
+  #     - 27017
+  #   restart: always
+  #   entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 
 

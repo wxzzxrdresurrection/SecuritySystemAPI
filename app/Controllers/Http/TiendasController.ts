@@ -24,8 +24,8 @@ export default class TiendasController {
       code: Math.floor(Math.random() * 9000 + 1000)
     })
 
-    /*const newTienda = TiendaMongo.create({
-        _id: tienda.id,
+    const newTienda = TiendaMongo.create({
+        altId: tienda.id,
         nombre: tienda.nombre,
         code: tienda.code,
     })
@@ -37,7 +37,7 @@ export default class TiendasController {
           error: null,
           data: null,
         })
-      }*/
+      }
 
     const user = await User.findOrFail(request.input('user_id'))
 
@@ -54,7 +54,6 @@ export default class TiendasController {
       data: tiendaUser
     })
   }
-
   //CALADO
   public async allTiendas() {
     const tiendas = (await Tienda.all()).reverse()
