@@ -201,9 +201,11 @@ export default class TiendaUsersController {
 
   public async getGuests({params, response} :HttpContextContract){
 
-    const owners = await UserTienda.query().where('is_owner', false).andWhere('id', params.id)
+    const guests = await UserTienda.query().where('tienda_id', params.id)
 
-    if(!owners){
+    const users = await User.query().whereNotIn('id', guests.map((guest) => guest.user_id)).andWhere('rol_id', 3)
+
+    if(!users){
       return response.status(404).json({
         status: 404,
         message: 'Usuario no encontrado',
@@ -212,7 +214,7 @@ export default class TiendaUsersController {
       })
     }
 
-    return owners;
+    return users;
   }
 }
 
