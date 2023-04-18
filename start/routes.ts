@@ -23,7 +23,6 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.get('/', async () => {
   return { hello: 'world' }
 })
-
 Route.post('/registro/info', 'UsersController.registrarInfoPersonal')
 Route.post('/registro/user', 'UsersController.registro')
 Route.post('/login', 'UsersController.login')
@@ -48,8 +47,11 @@ Route.group(() => {
 })
 
 Route.group(() => {
+  //1-2
   Route.get('/user/:id', 'UsersController.getUser').where('id', '[0-9]+')
+  //1-2
   Route.get('/users', 'UsersController.allUsers')
+  //1
   Route.get('/users/mod', 'UsersController.getMods')
   Route.get('/users/normal', 'UsersController.getNormalUsers')
   Route.get('/users/info', 'UsersController.getMyInfo').middleware('auth')
@@ -66,7 +68,10 @@ Route.group(() => {
 
 Route.group(() => {
   Route.post('/peticion', 'PeticionesController.createPeticion')
+
+  //1-2
   Route.get('/peticiones', 'PeticionesController.getPeticiones')
+  //1-2
   Route.put('/peticion/status/:id', 'PeticionesController.statusPeticion').where('id', '[0-9]+')
 })
 

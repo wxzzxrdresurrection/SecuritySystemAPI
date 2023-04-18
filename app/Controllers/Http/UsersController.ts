@@ -149,6 +149,7 @@ export default class UsersController {
       data: request.all(),
       id: user.id,
       username: user.username,
+      email: user.correo,
       role: user.rol_id,
       token: token,
     })
