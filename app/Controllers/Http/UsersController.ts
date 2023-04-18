@@ -895,6 +895,11 @@ export default class UsersController {
 
   }
 
+  public async getUserAcces({auth}: HttpContextContract){
+    const user = await auth.use('api').authenticate()
 
+    return user
+  }
+  
 
 }
