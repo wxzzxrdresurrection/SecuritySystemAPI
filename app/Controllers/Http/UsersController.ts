@@ -4,6 +4,10 @@ import Hash from '@ioc:Adonis/Core/Hash'
 import User from 'App/Models/User'
 import InfoUser from 'App/Models/InfoUser'
 import Pregunta from 'App/Models/Pregunta'
+import Mail from '@ioc:Adonis/Addons/Mail'
+import Env from '@ioc:Adonis/Core/Env'
+import Route from '@ioc:Adonis/Core/Route'
+const { Vonage } = require('@vonage/server-sdk')
 
 export default class UsersController {
 
@@ -20,7 +24,7 @@ export default class UsersController {
       messages: {
         required: 'El campo {{ field }} es obligatorio',
         maxLength: 'El campo {{ field }} no puede tener más de {{ options.maxLength }} caracteres',
-        enum: 'El campo {{ field }} solo permite estas opciones: {{ options.choices }}',
+        enum: 'El campo {{ field }} solo p  ermite estas opciones: {{ options.choices }}',
         'date.format': 'El campo {{ field }} debe ser un formato {{ options.format }}',
       }
     })
@@ -650,5 +654,161 @@ export default class UsersController {
         user: user,
       })
   }
+  //CALADO
+  public async recuperacionCorreo({request, response}:HttpContextContract){
+
+    const user = await User.findBy('correo', request.input('correo'))
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const codigo = Math.floor(Math.random() * 9000 + 1000).toString()
+
+    await user.merge({
+      codigo_verificacion: codigo,
+    }).save()
+
+
+    const ruta = Route.makeSignedUrl('codigo',{id: user.id}, {expiresIn: '1h', prefixUrl: Env.get('APP_URL')})
+
+    try{
+      await Mail.send((message) => {
+        message
+          .from('magicwizz12@gmail.com')
+          .to(user.correo)
+          .subject('RECUPERACION DE CONTRASEÑA')
+          .htmlView('emails/recuperacion', {codigo: codigo})
+      })
+    }
+    catch(e){
+      console.log(e)
+    }
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Correo enviado correctamente',
+      error: null,
+      data: null,
+      ruta: ruta,
+    })
+
+
+  }
+  //CALADO
+  public async verifyCode({request ,params, response}: HttpContextContract){
+
+    await request.validate({
+      schema: schema.create({
+        codigo: schema.string({trim: true}),
+      }),
+      messages: {
+        'codigo.required': 'El codigo es requerido',
+        'codigo.string': 'El codigo debe ser un string',
+      }
+    })
+
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    if(user.codigo_verificacion !== request.input('codigo')){
+      return response.status(404).json({
+        status: 404,
+        message: 'Codigo incorrecto',
+        error: null,
+        data: null,
+      })
+    }
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Codigo correcto',
+      error: null,
+      data: null,
+    })
+
+  }
+  //CALADO
+  public async recuperacionTelefono({request, response}: HttpContextContract){
+
+    await request.validate({
+      schema: schema.create({
+        telefono: schema.string({trim: true}),
+
+      })
+    })
+
+    const user = await User.findBy('telefono', request.input('telefono'))
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const codigo = Math.floor(Math.random() * 9000 + 1000).toString()
+
+    await user.merge({
+      codigo_verificacion: codigo,
+    }).save()
+
+    const ruta = Route.makeSignedUrl('codigo',{id: user.id}, {expiresIn: '1h', prefixUrl: Env.get('APP_URL')})
+
+    const vonage = new Vonage({
+      apiKey: "a72cb7d2",
+      apiSecret: "JTOM8ZOCLTfcjeaH"
+    })
+
+    const from = "Shop Shield"
+    const to =  "52" + user.telefono
+    const text = 'Codigo de recuperación: ' + codigo
+
+    await vonage.sms.send({to, from, text})
+        .then(resp => { console.log('Message sent successfully'), console.log(resp)})
+        .catch(err => { console.log('There was an error sending the messages.'), console.error(err) })
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Codigo enviado correctamente',
+      error: null,
+      data: null,
+      ruta: ruta,
+    })
+
+
+
+
+
+
+
+
+  }
+
+  public async recuperacionPregunta({request, response}: HttpContextContract){
+    
+
+  }
+
+  public async getMyPregunta({request, response}: HttpContextContract){
+
+  }
+
+
 
 }

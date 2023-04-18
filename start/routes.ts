@@ -30,6 +30,10 @@ Route.post('/login', 'UsersController.login')
 Route.get('/logout', 'UsersController.logout').middleware('auth')
 Route.get('/preguntas', 'UsersController.getPreguntas')
 Route.post('/verify/access', 'UsersController.verifyAvailableEmailAndPhone')
+Route.post('/send/email', 'UsersController.recuperacionCorreo')
+Route.post('/receive/code/:id', 'UsersController.verifyCode').as('codigo')
+Route.post('/send/sms', 'UsersController.recuperacionTelefono')
+
 
 Route.group(() => {
   Route.get('/tiendas', 'TiendasController.allTiendas')
