@@ -33,6 +33,7 @@ Route.post('/verify/access', 'UsersController.verifyAvailableEmailAndPhone')
 Route.post('/send/email', 'UsersController.recuperacionCorreo')
 Route.post('/receive/code/:id', 'UsersController.verifyCode').as('codigo')
 Route.post('/send/sms', 'UsersController.recuperacionTelefono')
+Route.post('/send/sms/verify', 'UsersController.sendSMS')
 
 
 Route.group(() => {
