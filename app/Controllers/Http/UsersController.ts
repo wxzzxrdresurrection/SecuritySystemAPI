@@ -36,7 +36,7 @@ export default class UsersController {
       sexo: request.input('sexo'),
       fecha_nacimiento: request.input('fecha_nacimiento'),
       pregunta_id : request.input('pregunta_id'),
-      respuesta: request.input('respuesta'),
+      respuesta: request.input('respuesta').toLowerCase(),
     })
 
     if(!infoUser){
@@ -801,11 +801,97 @@ export default class UsersController {
   }
 
   public async recuperacionPregunta({request, response}: HttpContextContract){
-    
+
+      await request.validate({
+        schema: schema.create({
+          user_id: schema.number(),
+          respuesta: schema.string({trim: true}),
+        })
+      })
+
+      const user = await User.find(request.input('user_id'))
+
+      if(!user){
+        return response.status(404).json({
+          status: 404,
+          message: 'Usuario no encontrado',
+          error: null,
+          data: null,
+        })
+      }
+
+      const infoUser = await InfoUser.find(user.info_user_id)
+
+      if(!infoUser){
+        return response.status(404).json({
+          status: 404,
+          message: 'Información de usuario no encontrada',
+          error: null,
+          data: null,
+        })
+      }
+
+
+      if(infoUser.respuesta !== request.input('respuesta')){
+        return response.status(404).json({
+          status: 404,
+          message: 'Pregunta incorrecta',
+          error: null,
+          data: null,
+        })
+      }
+
+      return response.status(200).json({
+        status: 200,
+        message: 'Respuesta correcta',
+        error: null,
+        data: null,
+      })
 
   }
 
-  public async getMyPregunta({request, response}: HttpContextContract){
+  public async getMyPregunta({params, response}: HttpContextContract){
+
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const infoUser = await InfoUser.find(user.info_user_id)
+
+    if(!infoUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Información de usuario no encontrada',
+        error: null,
+        data: null,
+      })
+    }
+
+    const pregunta = await Pregunta.find(infoUser.pregunta_id)
+
+    if(!pregunta){
+      return response.status(404).json({
+        status: 404,
+        message: 'Pregunta no encontrada',
+        error: null,
+        data: null,
+      })
+    }
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Pregunta encontrada',
+      error: null,
+      data: pregunta.pregunta,
+    })
+
 
   }
 

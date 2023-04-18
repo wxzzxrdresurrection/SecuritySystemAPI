@@ -66,6 +66,8 @@ Route.group(() => {
   Route.put('/users/info/:id', 'UsersController.updateInfoUser').where('id', '[0-9]+')
   Route.post('/users/mod', 'UsersController.addUserModerador')
   Route.delete('/users/mod/:id', 'UsersController.deleteMod').where('id', '[0-9]+')
+  Route.get('/user/pregunta/:id', 'UsersController.getMyPregunta').where('id', '[0-9]+')
+  Route.post('/user/pregunta/answer' , 'UsersController.recuperacionPregunta')
 })
 
 Route.group(() => {
