@@ -74,6 +74,8 @@ Route.group(() => {
   Route.post('/user/update/password', 'UsersController.updatePassword')
   Route.post('/user/update/passwor/auth', 'UsersController.updatePasswordToken')
   Route.post('/user/email/phone', 'UsersController.getUserByEmailOrPhone')
+  Route.post('/user/update/access', 'UsersController.updateUserToken')
+  Route.post('/user/update/info', 'UsersController.updateInfoUserToken')
 
 })
 
