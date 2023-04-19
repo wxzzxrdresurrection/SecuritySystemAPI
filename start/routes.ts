@@ -50,6 +50,8 @@ Route.group(() => {
   Route.post('/tiendas/invitado', 'TiendaUsersController.addInvitado')
   Route.put('/tiendas/invitados/:id', 'TiendaUsersController.deleteInvitados').where('id', '[0-9]+')
   Route.get('/tiendas/invitados/guests/:id', 'TiendaUsersController.getGuests').where('id', '[0-9]+')
+  Route.get('/tiendas/propias', 'TiendaUsersController.misTiendasToken')
+  Route.get('/tienda/invitar', 'TiendaUsersController.invitarAMisTiendas')
 })
 
 Route.group(() => {
@@ -69,6 +71,10 @@ Route.group(() => {
   Route.delete('/users/mod/:id', 'UsersController.deleteMod').where('id', '[0-9]+')
   Route.get('/user/pregunta/:id', 'UsersController.getMyPregunta').where('id', '[0-9]+')
   Route.post('/user/pregunta/answer' , 'UsersController.recuperacionPregunta')
+  Route.post('/user/update/password', 'UsersController.updatePassword')
+  Route.post('/user/update/passwor/auth', 'UsersController.updatePasswordToken')
+  Route.post('/user/email/phone', 'UsersController.getUserByEmailOrPhone')
+
 })
 
 Route.group(() => {
@@ -81,6 +87,8 @@ Route.group(() => {
   Route.post('/invitacion', 'InvitacionesController.sendInvitacion')
   Route.get('/invitaciones/:id', 'InvitacionesController.misInvitaciones').where('id', '[0-9]+')
   Route.post('/invitacion/process', 'InvitacionesController.procesarInvitacion')
+  Route.get('/invitaciones/recibidas', 'InvitacionesController.misInvitacionesRecibidasToken')
+  Route.get('/invitaciones/enviadas', 'InvitacionesController.misInvitacionesEnviadasToken')
 })
 
 Route.group(() => {

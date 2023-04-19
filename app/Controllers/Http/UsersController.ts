@@ -1010,7 +1010,7 @@ export default class UsersController {
     }
 
     await user.merge({
-      password: request.input('new_password'),
+      password: await Hash.make(request.input('new_password')),
     }).save()
 
     return response.status(200).json({
@@ -1020,4 +1020,66 @@ export default class UsersController {
       data: null,
     })
   }
+
+  public async updatePasswordToken({request, auth, response} :HttpContextContract){
+    const user = await auth.use('api').authenticate()
+
+    await request.validate({
+      schema: schema.create({
+        new_password: schema.string([rules.trim(), rules.minLength(8)]),
+        old_password: schema.string([rules.trim(), rules.minLength(8)]),
+      }),
+      messages: {
+        required : 'El campo {{ field }} es requerido',
+        minLength: 'El campo {{ field }} debe tener al menos {{ options.minLength }} caracteres',
+        trim: 'El campo {{ field }} no debe contener espacios en blanco',
+      }
+    })
+
+    if(!await Hash.verify(user.password, request.input('old_password'))){
+      return response.status(404).json({
+        status: 404,
+        message: 'Contraseña incorrecta',
+        error: null,
+        data: null,
+      })
+    }
+
+    await user.merge({
+      password: await Hash.make(request.input('new_password')),
+    }).save()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Contraseña actualizada correctamente',
+      error: null,
+      data: user,
+    })
+
+  }
+
+  public async getUserByEmailOrPhone({request, response}: HttpContextContract){
+
+    await request.validate({
+      schema: schema.create({
+        correo_o_telefono: schema.string({trim: true}),
+      })
+    })
+
+    const user = await User.query().where('correo', request.input('correo_o_telefono'))
+                       .orWhere('telefono', request.input('correo_o_telefono')).first()
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    return user
+  }
+
+  
 }
