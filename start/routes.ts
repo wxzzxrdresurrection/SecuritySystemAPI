@@ -29,6 +29,10 @@ Route.post('/login', 'UsersController.login')
 Route.get('/logout', 'UsersController.logout').middleware('auth')
 Route.get('/preguntas', 'UsersController.getPreguntas')
 Route.post('/verify/access', 'UsersController.verifyAvailableEmailAndPhone')
+Route.post('/send/email', 'UsersController.recuperacionCorreo')
+Route.post('/receive/code/:id', 'UsersController.verifyCode').as('codigo')
+Route.post('/send/sms', 'UsersController.recuperacionTelefono')
+
 
 Route.group(() => {
   Route.get('/tiendas', 'TiendasController.allTiendas')
@@ -64,6 +68,8 @@ Route.group(() => {
   Route.put('/users/info/:id', 'UsersController.updateInfoUser').where('id', '[0-9]+')
   Route.post('/users/mod', 'UsersController.addUserModerador')
   Route.delete('/users/mod/:id', 'UsersController.deleteMod').where('id', '[0-9]+')
+  Route.get('/user/pregunta/:id', 'UsersController.getMyPregunta').where('id', '[0-9]+')
+  Route.post('/user/pregunta/answer' , 'UsersController.recuperacionPregunta')
 })
 
 Route.group(() => {
