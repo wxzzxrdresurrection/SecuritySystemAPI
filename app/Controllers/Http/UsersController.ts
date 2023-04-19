@@ -98,12 +98,81 @@ export default class UsersController {
       info_user_id : request.input('info_user_id'),
     })
 
+    const ruta = Route.makeSignedUrl('sendSMS', {params: {id: user.id}})
+
+    try{
+      await Mail.send((message) => {
+        message
+          .from('')
+          .to(request.input('correo'))
+          .subject('Activacion de cuenta')
+          .htmlView('emails/activacion', {user : user, ruta: ruta})
+      })
+    }
+    catch(error){
+      console.log(error)
+    }
+
     return response.status(201).json({
       status: 201,
       message: 'Usuario registrado correctamente',
       error: null,
       data: user,
     })
+  }
+
+  public async sendSMS({request, params, response}: HttpContextContract){
+
+    if(!request.hasValidSignature){
+      return response.status(401).json({
+        status: 401,
+        message: 'No se pudo verificar la firma',
+        error: null,
+        data: null,
+      })
+    }
+
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'El usuario no existe',
+        error: null,
+        data: null,
+      })
+    }
+    const codigo = Math.floor(Math.random() * 9000 + 1000).toString()
+
+    await user.merge({
+      codigo_verificacion: codigo,
+      estatus : 1
+    }).save()
+
+    const ruta = Route.makeSignedUrl('codigo',{id: user.id}, {expiresIn: '1h', prefixUrl: Env.get('APP_URL')})
+
+    const vonage = new Vonage({
+      apiKey: Env.get('VONAGE_API_KEY'),
+      apiSecret: Env.get('VONAGE_API_SECRET'),
+    })
+
+    const from = "Shop Shield"
+    const to =  "52" + user.telefono
+    const text = 'Su codigo de activacion es: ' + codigo
+
+    await vonage.sms.send({to, from, text})
+        .then(resp => { console.log('Message sent successfully'), console.log(resp)})
+        .catch(err => { console.log('There was an error sending the messages.'), console.error(err) })
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Codigo enviado correctamente',
+      error: null,
+      data: null,
+      ruta: ruta,
+    })
+
+
   }
 
   public async login({ request, response, auth }: HttpContextContract) {
@@ -704,6 +773,15 @@ export default class UsersController {
   //CALADO
   public async verifyCode({request ,params, response}: HttpContextContract){
 
+    if(!request.hasValidSignature()){
+      return response.status(404).json({
+        status: 404,
+        message: 'Ruta no valida',
+        error: null,
+        data: null,
+      })
+    }
+
     await request.validate({
       schema: schema.create({
         codigo: schema.string({trim: true}),
@@ -732,6 +810,12 @@ export default class UsersController {
         error: null,
         data: null,
       })
+    }
+
+    if(user.estatus === 1){
+      await user.merge({
+        estatus: 2
+    }).save()
     }
 
     return response.status(200).json({
@@ -772,8 +856,8 @@ export default class UsersController {
     const ruta = Route.makeSignedUrl('codigo',{id: user.id}, {expiresIn: '1h', prefixUrl: Env.get('APP_URL')})
 
     const vonage = new Vonage({
-      apiKey: "a72cb7d2",
-      apiSecret: "JTOM8ZOCLTfcjeaH"
+      apiKey: Env.get('VONAGE_API_KEY'),
+      apiSecret: Env.get('VONAGE_API_SECRET'),
     })
 
     const from = "Shop Shield"
@@ -791,13 +875,6 @@ export default class UsersController {
       data: null,
       ruta: ruta,
     })
-
-
-
-
-
-
-
 
   }
 
@@ -901,6 +978,109 @@ export default class UsersController {
 
     return user
   }
-  
 
+  public async updatePassword({request, response}: HttpContextContract){
+
+    await request.validate({
+      schema: schema.create({
+
+        old_password: schema.string({trim: true}),
+        new_password: schema.string({trim: true}),
+        user_id: schema.number(),
+      })
+    })
+
+    const user = await User.find(request.input('user_id'))
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    if(!await Hash.verify(user.password, request.input('old_password'))){
+      return response.status(404).json({
+        status: 404,
+        message: 'Contraseña incorrecta',
+        error: null,
+        data: null,
+      })
+    }
+
+    await user.merge({
+      password: await Hash.make(request.input('new_password')),
+    }).save()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Contraseña actualizada correctamente',
+      error: null,
+      data: null,
+    })
+  }
+
+  public async updatePasswordToken({request, auth, response} :HttpContextContract){
+    const user = await auth.use('api').authenticate()
+
+    await request.validate({
+      schema: schema.create({
+        new_password: schema.string([rules.trim(), rules.minLength(8)]),
+        old_password: schema.string([rules.trim(), rules.minLength(8)]),
+      }),
+      messages: {
+        required : 'El campo {{ field }} es requerido',
+        minLength: 'El campo {{ field }} debe tener al menos {{ options.minLength }} caracteres',
+        trim: 'El campo {{ field }} no debe contener espacios en blanco',
+      }
+    })
+
+    if(!await Hash.verify(user.password, request.input('old_password'))){
+      return response.status(404).json({
+        status: 404,
+        message: 'Contraseña incorrecta',
+        error: null,
+        data: null,
+      })
+    }
+
+    await user.merge({
+      password: await Hash.make(request.input('new_password')),
+    }).save()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Contraseña actualizada correctamente',
+      error: null,
+      data: user,
+    })
+
+  }
+
+  public async getUserByEmailOrPhone({request, response}: HttpContextContract){
+
+    await request.validate({
+      schema: schema.create({
+        correo_o_telefono: schema.string({trim: true}),
+      })
+    })
+
+    const user = await User.query().where('correo', request.input('correo_o_telefono'))
+                       .orWhere('telefono', request.input('correo_o_telefono')).first()
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    return user
+  }
+
+  
 }
