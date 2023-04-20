@@ -773,22 +773,22 @@ export default class UsersController {
   //CALADO
   public async verifyCode({request ,params, response}: HttpContextContract){
 
-    if(!request.hasValidSignature()){
+    /*if(!request.hasValidSignature()){
       return response.status(404).json({
         status: 404,
         message: 'Ruta no valida',
         error: null,
         data: null,
       })
-    }
+    }*/
 
     await request.validate({
       schema: schema.create({
-        codigo: schema.string({trim: true}),
+        codigo_verificacion: schema.string({trim: true}),
       }),
       messages: {
-        'codigo.required': 'El codigo es requerido',
-        'codigo.string': 'El codigo debe ser un string',
+        'codigo_verificacion.required': 'El codigo es requerido',
+        'codigo_verificacion.string': 'El codigo debe ser un string',
       }
     })
 
@@ -803,7 +803,7 @@ export default class UsersController {
       })
     }
 
-    if(user.codigo_verificacion !== request.input('codigo')){
+    if(user.codigo_verificacion !== request.input('codigo_verificacion')){
       return response.status(404).json({
         status: 404,
         message: 'Codigo incorrecto',
@@ -812,9 +812,9 @@ export default class UsersController {
       })
     }
 
-    if(user.estatus === 1){
+    if(user.estatus != 2){
       await user.merge({
-        estatus: 2
+        estatus: 3
     }).save()
     }
 
@@ -974,7 +974,7 @@ export default class UsersController {
 
   }
 
-  public async getUserAcces({auth}: HttpContextContract){
+  public async getUserAccess({auth}: HttpContextContract){
     const user = await auth.use('api').authenticate()
 
     return user
@@ -1017,8 +1017,8 @@ export default class UsersController {
 
     await request.validate({
       schema: schema.create({
+        password: schema.string([rules.trim(), rules.minLength(8)]),
         new_password: schema.string([rules.trim(), rules.minLength(8)]),
-        old_password: schema.string([rules.trim(), rules.minLength(8)]),
       }),
       messages: {
         required : 'El campo {{ field }} es requerido',
@@ -1027,7 +1027,7 @@ export default class UsersController {
       }
     })
 
-    if(!await Hash.verify(user.password, request.input('old_password'))){
+    if(!await Hash.verify(user.password, request.input('password'))){
       return response.status(404).json({
         status: 404,
         message: 'Contraseña incorrecta',

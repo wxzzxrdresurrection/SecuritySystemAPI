@@ -30,7 +30,7 @@ Route.get('/logout', 'UsersController.logout').middleware('auth')
 Route.get('/preguntas', 'UsersController.getPreguntas')
 Route.post('/verify/access', 'UsersController.verifyAvailableEmailAndPhone')
 Route.post('/send/email', 'UsersController.recuperacionCorreo')
-Route.post('/receive/code/:id', 'UsersController.verifyCode').as('codigo')
+Route.put('/receive/code/:id', 'UsersController.verifyCode').as('codigo')
 Route.post('/send/sms', 'UsersController.recuperacionTelefono')
 Route.post('/send/sms/verify', 'UsersController.sendSMS')
 
@@ -58,6 +58,7 @@ Route.group(() => {
   Route.get('/users', 'UsersController.allUsers')
   Route.get('/users/mod', 'UsersController.getMods')
   Route.get('/users/normal', 'UsersController.getNormalUsers')
+  Route.get('/users/access', 'UsersController.getUserAccess')
   Route.get('/users/info', 'UsersController.getMyInfo').middleware('auth')
   Route.get('/users/info/:id', 'UsersController.getInfoUser').where('id', '[0-9]+')
   Route.post('/registro/complete', 'UsersController.registroCompleto')
@@ -71,10 +72,11 @@ Route.group(() => {
   Route.get('/user/pregunta/:id', 'UsersController.getMyPregunta').where('id', '[0-9]+')
   Route.post('/user/pregunta/answer' , 'UsersController.recuperacionPregunta')
   Route.put('/user/update/password', 'UsersController.updatePassword')
-  Route.post('/user/update/passwor/auth', 'UsersController.updatePasswordToken')
   Route.post('/user/email/phone', 'UsersController.getUserByEmailOrPhone')
-  Route.post('/user/update/access', 'UsersController.updateUserToken')
-  Route.post('/user/update/info', 'UsersController.updateInfoUserToken')
+
+  Route.put('/user/update/access', 'UsersController.updateUserToken')
+  Route.put('/user/update/info', 'UsersController.updateInfoUserToken')
+  Route.put('/user/update/password/auth', 'UsersController.updatePasswordToken')
 
 })
 
