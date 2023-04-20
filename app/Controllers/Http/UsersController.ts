@@ -826,6 +826,7 @@ export default class UsersController {
     })
 
   }
+
   //CALADO
   public async recuperacionTelefono({request, response}: HttpContextContract){
 
@@ -983,10 +984,8 @@ export default class UsersController {
 
     await request.validate({
       schema: schema.create({
-
-        old_password: schema.string({trim: true}),
-        new_password: schema.string({trim: true}),
         user_id: schema.number(),
+        password: schema.string({trim: true}),
       })
     })
 
@@ -1001,17 +1000,8 @@ export default class UsersController {
       })
     }
 
-    if(!await Hash.verify(user.password, request.input('old_password'))){
-      return response.status(404).json({
-        status: 404,
-        message: 'Contraseña incorrecta',
-        error: null,
-        data: null,
-      })
-    }
-
     await user.merge({
-      password: await Hash.make(request.input('new_password')),
+      password: await Hash.make(request.input('password')),
     }).save()
 
     return response.status(200).json({

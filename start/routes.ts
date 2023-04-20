@@ -70,7 +70,7 @@ Route.group(() => {
   Route.delete('/users/mod/:id', 'UsersController.deleteMod').where('id', '[0-9]+')
   Route.get('/user/pregunta/:id', 'UsersController.getMyPregunta').where('id', '[0-9]+')
   Route.post('/user/pregunta/answer' , 'UsersController.recuperacionPregunta')
-  Route.post('/user/update/password', 'UsersController.updatePassword')
+  Route.put('/user/update/password', 'UsersController.updatePassword')
   Route.post('/user/update/passwor/auth', 'UsersController.updatePasswordToken')
   Route.post('/user/email/phone', 'UsersController.getUserByEmailOrPhone')
   Route.post('/user/update/access', 'UsersController.updateUserToken')
