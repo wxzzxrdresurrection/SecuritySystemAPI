@@ -6,10 +6,9 @@ Ws.boot()
  */
 Ws.io.on('connection', (socket) => {
   console.log('connected client: ' + socket.id)
-  socket.emit('news', { hello: 'world' })
-
-  socket.on('my other event', (data) => {
+  socket.on('new-data',(data) => {
     console.log(data)
+    socket.broadcast.emit('casa-' + 2)
   })
 
   socket.emit('video', {})
