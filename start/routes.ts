@@ -78,6 +78,7 @@ Route.group(() => {
   Route.put('/user/update/access', 'UsersController.updateUserToken')
   Route.put('/user/update/info', 'UsersController.updateInfoUserToken')
   Route.put('/user/update/password/auth', 'UsersController.updatePasswordToken')
+  Route.get('/users/info/all', 'UsersController.allInfoUsers')
 
 })
 

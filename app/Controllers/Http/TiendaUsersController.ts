@@ -82,8 +82,10 @@ export default class TiendaUsersController {
     return invitados;
   }
 
-  public async getOwners({response}: HttpContextContract){
-    const owners = await UserTienda.query().where('is_owner', true)
+  public async getOwners({response, auth}: HttpContextContract){
+    const user = await auth.use('api').authenticate()
+
+    const owners = await UserTienda.query().where('user_id', user.id).andWhere('is_owner', true)
 
     if(!owners){
       return response.status(404).json({
