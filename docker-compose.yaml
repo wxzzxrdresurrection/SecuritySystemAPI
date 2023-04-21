@@ -27,7 +27,7 @@ services:
     restart: always
     build: .
     ports:
-      - ${PORT}:${PORT}
+      - 3333:3333
     env_file:
       - .env
 
