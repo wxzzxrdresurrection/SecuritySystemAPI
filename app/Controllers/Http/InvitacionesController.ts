@@ -27,6 +27,17 @@ export default class InvitacionesController {
       }
     })
 
+    const inv = await Invitacione.query().where('owner_id', request.input('owner_id')).andWhere('invitado_id', request.input('invitado_id')).andWhere('tienda_id', request.input('tienda_id')).first()
+
+    if(inv) {
+      return response.status(400).json({
+        status: 400,
+        message: 'Ya se ha enviado una invitacion',
+        error: null,
+        data: null
+      })
+    }
+
     const invitacion = await Invitacione.create({
       owner_id: request.input('owner_id'),
       invitado_id: request.input('invitado_id'),
