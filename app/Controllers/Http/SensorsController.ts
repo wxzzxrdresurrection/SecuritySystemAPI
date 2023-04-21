@@ -1,6 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import SensorMongo from 'App/Models/SensorMongo'
-import TiendaMongo from 'App/Models/TiendaMongo';
+import SensorValorMongo from 'App/Models/SensorValor'
 import Tienda from 'App/Models/Tienda';
 
 export default class SensorsController {
@@ -89,6 +89,28 @@ export default class SensorsController {
       data: sensores
     })
 
+  }
+
+  public async getValues({response}: HttpContextContract){
+      
+      const sensor = await SensorValorMongo.find()
+  
+      if(!sensor){
+        return response.status(404).json({
+          status: 404,
+          message: 'Sensor no encontrado',
+          error: 'Sensor no encontrado',
+          data: null
+        })
+      }
+  
+      return response.status(200).json({
+        status: 200,
+        message: 'Sensor',
+        error: null,
+        data: sensor
+      })
+  
   }
 
   
