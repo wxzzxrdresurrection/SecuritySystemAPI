@@ -98,21 +98,6 @@ export default class UsersController {
       info_user_id : request.input('info_user_id'),
     })
 
-    const ruta = Route.makeSignedUrl('sendSMS', {params: {id: user.id}})
-
-    try{
-      await Mail.send((message) => {
-        message
-          .from('')
-          .to(request.input('correo'))
-          .subject('Activacion de cuenta')
-          .htmlView('emails/activacion', {user : user, ruta: ruta})
-      })
-    }
-    catch(error){
-      console.log(error)
-    }
-
     return response.status(201).json({
       status: 201,
       message: 'Usuario registrado correctamente',
@@ -205,6 +190,22 @@ export default class UsersController {
     }
 
     if (user.estatus === 0) {
+
+      const ruta = Route.makeSignedUrl('sendSMS', {params: {id: user.id}})
+
+      try{
+        await Mail.send((message) => {
+          message
+            .from('')
+            .to(request.input('correo'))
+            .subject('Activacion de cuenta')
+            .htmlView('emails/activacion', {user : user, ruta: ruta})
+        })
+      }
+      catch(error){
+        console.log(error)
+      }
+
       return response.status(404).json({
         status: 404,
         message: 'Si deseas activar tu cuenta, contacte con un adminstrador',
