@@ -51,6 +51,7 @@ Route.group(() => {
   Route.get('/tiendas/invitados/guests/:id', 'TiendaUsersController.getGuests').where('id', '[0-9]+')
   Route.get('/tiendas/propias', 'TiendaUsersController.misTiendasToken')
   Route.get('/tienda/invitar', 'TiendaUsersController.invitarAMisTiendas')
+  Route.post('/tienda/verify/owner','TiendaUsersController.verifyOwner')
 })
 
 Route.group(() => {

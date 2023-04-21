@@ -318,6 +318,38 @@ export default class TiendaUsersController {
 
   }
 
+  public async verifyOwner({auth, request, response}: HttpContextContract){
+
+    await request.validate({
+      schema: schema.create({
+        tienda_id : schema.number(),
+      })
+    })
+
+    const user = await auth.use('api').authenticate()
+
+    const tienda = await Tienda.find(request.input('tienda_id'))
+
+    if(!tienda){
+      return response.status(404).json({
+        status: 404,
+        message: 'Tienda no encontrada',
+        error: 'Tienda no encontrada',
+        data: null
+      })
+    }
+
+    const tiendaUser = await UserTienda.query().where('tienda_id', tienda.id).andWhere('user_id', user.id).andWhere('is_owner', true)
+
+    if(!tiendaUser){
+      return false
+    }
+
+    return true
+
+
+  }
+
 }
 
 
