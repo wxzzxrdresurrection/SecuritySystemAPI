@@ -27,6 +27,15 @@ export default class InvitacionesController {
       }
     })
 
+    if(request.input('owner_id') === request.input('invitado_id')) {
+      return response.status(400).json({
+        status: 400,
+        message: 'No puedes invitarte a ti mismo',
+        error: null,
+        data: null
+      })
+    }
+
     const inv = await Invitacione.query().where('owner_id', request.input('owner_id')).andWhere('invitado_id', request.input('invitado_id')).andWhere('tienda_id', request.input('tienda_id')).first()
 
     if(inv) {
