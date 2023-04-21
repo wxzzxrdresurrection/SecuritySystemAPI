@@ -812,7 +812,7 @@ export default class UsersController {
       })
     }
 
-    if(user.estatus != 2){
+    if(user.estatus !== 2){
       await user.merge({
         estatus: 3
     }).save()
@@ -1142,6 +1142,23 @@ export default class UsersController {
       error: null,
       data: updatedInfo,
     })
+
+  }
+
+  public async  allInfoUsers({response}: HttpContextContract){
+
+    const infoUsers = await InfoUser.all()
+
+    if(!infoUsers){
+      return response.status(404).json({
+        status: 404,
+        message: 'Información de usuarios no encontrada',
+        error: null,
+        data: null,
+      })
+    }
+
+    return infoUsers
 
   }
 }
