@@ -4,6 +4,10 @@ import Hash from '@ioc:Adonis/Core/Hash'
 import User from 'App/Models/User'
 import InfoUser from 'App/Models/InfoUser'
 import Pregunta from 'App/Models/Pregunta'
+import Mail from '@ioc:Adonis/Addons/Mail'
+import Env from '@ioc:Adonis/Core/Env'
+import Route from '@ioc:Adonis/Core/Route'
+const { Vonage } = require('@vonage/server-sdk')
 
 export default class UsersController {
 
@@ -20,7 +24,7 @@ export default class UsersController {
       messages: {
         required: 'El campo {{ field }} es obligatorio',
         maxLength: 'El campo {{ field }} no puede tener más de {{ options.maxLength }} caracteres',
-        enum: 'El campo {{ field }} solo permite estas opciones: {{ options.choices }}',
+        enum: 'El campo {{ field }} solo p  ermite estas opciones: {{ options.choices }}',
         'date.format': 'El campo {{ field }} debe ser un formato {{ options.format }}',
       }
     })
@@ -32,7 +36,7 @@ export default class UsersController {
       sexo: request.input('sexo'),
       fecha_nacimiento: request.input('fecha_nacimiento'),
       pregunta_id : request.input('pregunta_id'),
-      respuesta: request.input('respuesta'),
+      respuesta: request.input('respuesta').toLowerCase(),
     })
 
     if(!infoUser){
@@ -94,12 +98,81 @@ export default class UsersController {
       info_user_id : request.input('info_user_id'),
     })
 
+    const ruta = Route.makeSignedUrl('sendSMS', {params: {id: user.id}})
+
+    try{
+      await Mail.send((message) => {
+        message
+          .from('')
+          .to(request.input('correo'))
+          .subject('Activacion de cuenta')
+          .htmlView('emails/activacion', {user : user, ruta: ruta})
+      })
+    }
+    catch(error){
+      console.log(error)
+    }
+
     return response.status(201).json({
       status: 201,
       message: 'Usuario registrado correctamente',
       error: null,
       data: user,
     })
+  }
+
+  public async sendSMS({request, params, response}: HttpContextContract){
+
+    if(!request.hasValidSignature){
+      return response.status(401).json({
+        status: 401,
+        message: 'No se pudo verificar la firma',
+        error: null,
+        data: null,
+      })
+    }
+
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'El usuario no existe',
+        error: null,
+        data: null,
+      })
+    }
+    const codigo = Math.floor(Math.random() * 9000 + 1000).toString()
+
+    await user.merge({
+      codigo_verificacion: codigo,
+      estatus : 1
+    }).save()
+
+    const ruta = Route.makeSignedUrl('codigo',{id: user.id}, {expiresIn: '1h', prefixUrl: Env.get('APP_URL')})
+
+    const vonage = new Vonage({
+      apiKey: Env.get('VONAGE_API_KEY'),
+      apiSecret: Env.get('VONAGE_API_SECRET'),
+    })
+
+    const from = "Shop Shield"
+    const to =  "52" + user.telefono
+    const text = 'Su codigo de activacion es: ' + codigo
+
+    await vonage.sms.send({to, from, text})
+        .then(resp => { console.log('Message sent successfully'), console.log(resp)})
+        .catch(err => { console.log('There was an error sending the messages.'), console.error(err) })
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Codigo enviado correctamente',
+      error: null,
+      data: null,
+      ruta: ruta,
+    })
+
+
   }
 
   public async login({ request, response, auth }: HttpContextContract) {
@@ -149,6 +222,7 @@ export default class UsersController {
       data: request.all(),
       id: user.id,
       username: user.username,
+      email: user.correo,
       role: user.rol_id,
       token: token,
     })
@@ -650,5 +724,424 @@ export default class UsersController {
         user: user,
       })
   }
+  //CALADO
+  public async recuperacionCorreo({request, response}:HttpContextContract){
 
+    const user = await User.findBy('correo', request.input('correo'))
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const codigo = Math.floor(Math.random() * 9000 + 1000).toString()
+
+    await user.merge({
+      codigo_verificacion: codigo,
+    }).save()
+
+
+    const ruta = Route.makeSignedUrl('codigo',{id: user.id}, {expiresIn: '1h', prefixUrl: Env.get('APP_URL')})
+
+    try{
+      await Mail.send((message) => {
+        message
+          .from('magicwizz12@gmail.com')
+          .to(user.correo)
+          .subject('RECUPERACION DE CONTRASEÑA')
+          .htmlView('emails/recuperacion', {codigo: codigo})
+      })
+    }
+    catch(e){
+      console.log(e)
+    }
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Correo enviado correctamente',
+      error: null,
+      data: null,
+      ruta: ruta,
+    })
+
+
+  }
+  //CALADO
+  public async verifyCode({request ,params, response}: HttpContextContract){
+
+    /*if(!request.hasValidSignature()){
+      return response.status(404).json({
+        status: 404,
+        message: 'Ruta no valida',
+        error: null,
+        data: null,
+      })
+    }*/
+
+    await request.validate({
+      schema: schema.create({
+        codigo_verificacion: schema.string({trim: true}),
+      }),
+      messages: {
+        'codigo_verificacion.required': 'El codigo es requerido',
+        'codigo_verificacion.string': 'El codigo debe ser un string',
+      }
+    })
+
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    if(user.codigo_verificacion !== request.input('codigo_verificacion')){
+      return response.status(404).json({
+        status: 404,
+        message: 'Codigo incorrecto',
+        error: null,
+        data: null,
+      })
+    }
+
+    if(user.estatus != 2){
+      await user.merge({
+        estatus: 3
+    }).save()
+    }
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Codigo correcto',
+      error: null,
+      data: null,
+    })
+
+  }
+
+  //CALADO
+  public async recuperacionTelefono({request, response}: HttpContextContract){
+
+    await request.validate({
+      schema: schema.create({
+        telefono: schema.string({trim: true}),
+
+      })
+    })
+
+    const user = await User.findBy('telefono', request.input('telefono'))
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const codigo = Math.floor(Math.random() * 9000 + 1000).toString()
+
+    await user.merge({
+      codigo_verificacion: codigo,
+    }).save()
+
+    const ruta = Route.makeSignedUrl('codigo',{id: user.id}, {expiresIn: '1h', prefixUrl: Env.get('APP_URL')})
+
+    const vonage = new Vonage({
+      apiKey: Env.get('VONAGE_API_KEY'),
+      apiSecret: Env.get('VONAGE_API_SECRET'),
+    })
+
+    const from = "Shop Shield"
+    const to =  "52" + user.telefono
+    const text = 'Codigo de recuperación: ' + codigo
+
+    await vonage.sms.send({to, from, text})
+        .then(resp => { console.log('Message sent successfully'), console.log(resp)})
+        .catch(err => { console.log('There was an error sending the messages.'), console.error(err) })
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Codigo enviado correctamente',
+      error: null,
+      data: null,
+      ruta: ruta,
+    })
+
+  }
+
+  public async recuperacionPregunta({request, response}: HttpContextContract){
+
+      await request.validate({
+        schema: schema.create({
+          user_id: schema.number(),
+          respuesta: schema.string({trim: true}),
+        })
+      })
+
+      const user = await User.find(request.input('user_id'))
+
+      if(!user){
+        return response.status(404).json({
+          status: 404,
+          message: 'Usuario no encontrado',
+          error: null,
+          data: null,
+        })
+      }
+
+      const infoUser = await InfoUser.find(user.info_user_id)
+
+      if(!infoUser){
+        return response.status(404).json({
+          status: 404,
+          message: 'Información de usuario no encontrada',
+          error: null,
+          data: null,
+        })
+      }
+
+
+      if(infoUser.respuesta !== request.input('respuesta')){
+        return response.status(404).json({
+          status: 404,
+          message: 'Pregunta incorrecta',
+          error: null,
+          data: null,
+        })
+      }
+
+      return response.status(200).json({
+        status: 200,
+        message: 'Respuesta correcta',
+        error: null,
+        data: null,
+      })
+
+  }
+
+  public async getMyPregunta({params, response}: HttpContextContract){
+
+    const user = await User.find(params.id)
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const infoUser = await InfoUser.find(user.info_user_id)
+
+    if(!infoUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Información de usuario no encontrada',
+        error: null,
+        data: null,
+      })
+    }
+
+    const pregunta = await Pregunta.find(infoUser.pregunta_id)
+
+    if(!pregunta){
+      return response.status(404).json({
+        status: 404,
+        message: 'Pregunta no encontrada',
+        error: null,
+        data: null,
+      })
+    }
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Pregunta encontrada',
+      error: null,
+      data: pregunta.pregunta,
+    })
+
+
+  }
+
+  public async getUserAccess({auth}: HttpContextContract){
+    const user = await auth.use('api').authenticate()
+
+    return user
+  }
+
+  public async updatePassword({request, response}: HttpContextContract){
+
+    await request.validate({
+      schema: schema.create({
+        user_id: schema.number(),
+        password: schema.string({trim: true}),
+      })
+    })
+
+    const user = await User.find(request.input('user_id'))
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    await user.merge({
+      password: await Hash.make(request.input('password')),
+    }).save()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Contraseña actualizada correctamente',
+      error: null,
+      data: null,
+    })
+  }
+
+  public async updatePasswordToken({request, auth, response} :HttpContextContract){
+    const user = await auth.use('api').authenticate()
+
+    await request.validate({
+      schema: schema.create({
+        password: schema.string([rules.trim(), rules.minLength(8)]),
+        new_password: schema.string([rules.trim(), rules.minLength(8)]),
+      }),
+      messages: {
+        required : 'El campo {{ field }} es requerido',
+        minLength: 'El campo {{ field }} debe tener al menos {{ options.minLength }} caracteres',
+        trim: 'El campo {{ field }} no debe contener espacios en blanco',
+      }
+    })
+
+    if(!await Hash.verify(user.password, request.input('password'))){
+      return response.status(404).json({
+        status: 404,
+        message: 'Contraseña incorrecta',
+        error: null,
+        data: null,
+      })
+    }
+
+    await user.merge({
+      password: await Hash.make(request.input('new_password')),
+    }).save()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Contraseña actualizada correctamente',
+      error: null,
+      data: user,
+    })
+
+  }
+
+  public async getUserByEmailOrPhone({request, response}: HttpContextContract){
+
+    await request.validate({
+      schema: schema.create({
+        correo_o_telefono: schema.string({trim: true}),
+      })
+    })
+
+    const user = await User.query().where('correo', request.input('correo_o_telefono'))
+                       .orWhere('telefono', request.input('correo_o_telefono')).first()
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    return user
+  }
+
+  public async updateUserToken({auth, request, response}: HttpContextContract){
+
+    await request.validate({
+      schema: schema.create({
+        username: schema.string({trim: true}),
+      })
+    })
+
+    const user = await auth.use('api').authenticate()
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    user.merge({
+      username: request.input('username'),
+    }).save()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Usuario actualizado correctamente',
+      error: null,
+      data: user,
+    })
+
+  }
+
+  public async updateInfoUserToken({ auth, request, response}: HttpContextContract){
+
+    const user = await auth.use('api').authenticate()
+
+    if(!user){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: null,
+        data: null,
+      })
+    }
+
+    const infoUser = await InfoUser.find(user.info_user_id)
+
+    if(!infoUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Información de usuario no encontrada',
+        error: null,
+        data: null,
+      })
+    }
+
+    const updatedInfo = await infoUser.merge({
+      nombre: request.input('nombre'),
+      ap_materno: request.input('ap_materno'),
+      ap_paterno: request.input('ap_paterno'),
+      sexo: request.input('sexo'),
+      fecha_nacimiento: request.input('fecha_nacimiento'),
+    }).save()
+
+    return response.status(200).json({
+      status: 200,
+      message: 'Información de usuario actualizada correctamente',
+      error: null,
+      data: updatedInfo,
+    })
+
+  }
 }

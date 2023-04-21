@@ -144,4 +144,39 @@ export default class InvitacionesController {
 
 
   }
+
+  public async misInvitacionesEnviadasToken({auth, response}: HttpContextContract){
+    const user = await auth.use('api').authenticate()
+
+    const invitaciones = await Invitacione.query().where('owner_id', user.id)
+
+    if(!invitaciones) {
+      return response.status(400).json({
+        status: 400,
+        message: 'No se pudo obtener las invitaciones',
+        error: null,
+        data: null
+      })
+    }
+
+    return invitaciones
+  }
+
+  public async misInvitacionesRecibidasToken({auth, response}: HttpContextContract) {
+
+    const user = await auth.use('api').authenticate()
+
+    const invitaciones = await Invitacione.query().where('invitado_id', user.id)
+
+    if(!invitaciones) {
+      return response.status(400).json({
+        status: 400,
+        message: 'No se pudo obtener las invitaciones',
+        error: null,
+        data: null
+      })
+    }
+
+    return invitaciones
+  }
 }

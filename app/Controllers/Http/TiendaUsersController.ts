@@ -3,6 +3,8 @@ import User from 'App/Models/User'
 import { schema } from '@ioc:Adonis/Core/Validator'
 import Tienda from 'App/Models/Tienda'
 import UserTienda from 'App/Models/UserTienda'
+import Invitacione from 'App/Models/Invitacione'
+import { DateTime } from 'luxon'
 
 export default class TiendaUsersController {
 
@@ -201,9 +203,11 @@ export default class TiendaUsersController {
 
   public async getGuests({params, response} :HttpContextContract){
 
-    const owners = await UserTienda.query().where('is_owner', false).andWhere('id', params.id)
+    const guests = await UserTienda.query().where('tienda_id', params.id)
 
-    if(!owners){
+    const users = await User.query().whereNotIn('id', guests.map((guest) => guest.user_id)).andWhere('rol_id', 3)
+
+    if(!users){
       return response.status(404).json({
         status: 404,
         message: 'Usuario no encontrado',
@@ -212,8 +216,108 @@ export default class TiendaUsersController {
       })
     }
 
-    return owners;
+    return users;
   }
+
+  public async misTiendasToken({auth, response}: HttpContextContract){
+    const user = await auth.use('api').authenticate()
+
+    const tiendas = await UserTienda.query().where('user_id', user.id).andWhere('is_owner', true)
+
+    if(!tiendas){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: 'Usuario no encontrado',
+        data: null
+      })
+    }
+
+    return tiendas
+  }
+
+  public async invitarAMisTiendas({request, response}: HttpContextContract){
+
+    await request.validate({
+      schema: schema.create({
+        owner_id : schema.number(),
+        tienda_id : schema.number(),
+        guest_id : schema.number(),
+      })
+    })
+
+    const owner = await User.find(request.input('owner_id'))
+
+    if(!owner){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: 'Usuario no encontrado',
+        data: null
+      })
+    }
+
+    const tienda = await Tienda.find(request.input('tienda_id'))
+
+    if(!tienda){
+      return response.status(404).json({
+        status: 404,
+        message: 'Tienda no encontrada',
+        error: 'Tienda no encontrada',
+        data: null
+      })
+    }
+
+    const guest = await User.find(request.input('guest_id'))
+
+    if(!guest){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+        error: 'Usuario no encontrado',
+        data: null
+      })
+    }
+
+    const tiendaUser = await UserTienda.query().where('tienda_id', tienda.id).andWhere('user_id', owner.id).andWhere('is_owner', true)
+
+    if(!tiendaUser){
+      return response.status(404).json({
+        status: 404,
+        message: 'Tienda no válida',
+        error: 'Tienda no válida',
+        data: null
+      })
+    }
+
+    const invitado = await UserTienda.query().where('tienda_id', tienda.id).andWhere('user_id', guest.id).andWhere('is_owner', false)
+
+    if(invitado){
+      return response.status(404).json({
+        status: 404,
+        message: 'Usuario ya es invitado',
+        error: 'Usuario ya es invitado',
+        data: null
+      })
+    }
+
+    const invitacion = await Invitacione.create({
+      owner_id: owner.id,
+      invitado_id: guest.id,
+      tienda_id: tienda.id,
+      fecha: DateTime.now().toFormat('yyyy-MM-dd'),
+    })
+
+    return response.status(201).json({
+      status: 201,
+      message: 'Invitación enviada correctamente',
+      error: null,
+      data: invitacion
+    })
+
+
+  }
+
 }
 
 

@@ -23,13 +23,17 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.get('/', async () => {
   return { hello: 'world' }
 })
-
 Route.post('/registro/info', 'UsersController.registrarInfoPersonal')
 Route.post('/registro/user', 'UsersController.registro')
 Route.post('/login', 'UsersController.login')
 Route.get('/logout', 'UsersController.logout').middleware('auth')
 Route.get('/preguntas', 'UsersController.getPreguntas')
 Route.post('/verify/access', 'UsersController.verifyAvailableEmailAndPhone')
+Route.post('/send/email', 'UsersController.recuperacionCorreo')
+Route.put('/receive/code/:id', 'UsersController.verifyCode').as('codigo')
+Route.post('/send/sms', 'UsersController.recuperacionTelefono')
+Route.post('/send/sms/verify', 'UsersController.sendSMS')
+
 
 Route.group(() => {
   Route.get('/tiendas', 'TiendasController.allTiendas')
@@ -44,7 +48,9 @@ Route.group(() => {
   Route.get('/tiendas/invitados/owners', 'TiendaUsersController.getOwners')
   Route.post('/tiendas/invitado', 'TiendaUsersController.addInvitado')
   Route.put('/tiendas/invitados/:id', 'TiendaUsersController.deleteInvitados').where('id', '[0-9]+')
-  Route.get('/tiendas/invitados/owner/:id', 'TiendaUsersController.getGuests').where('id', '[0-9]+')
+  Route.get('/tiendas/invitados/guests/:id', 'TiendaUsersController.getGuests').where('id', '[0-9]+')
+  Route.get('/tiendas/propias', 'TiendaUsersController.misTiendasToken')
+  Route.get('/tienda/invitar', 'TiendaUsersController.invitarAMisTiendas')
 })
 
 Route.group(() => {
@@ -52,6 +58,7 @@ Route.group(() => {
   Route.get('/users', 'UsersController.allUsers')
   Route.get('/users/mod', 'UsersController.getMods')
   Route.get('/users/normal', 'UsersController.getNormalUsers')
+  Route.get('/users/access', 'UsersController.getUserAccess')
   Route.get('/users/info', 'UsersController.getMyInfo').middleware('auth')
   Route.get('/users/info/:id', 'UsersController.getInfoUser').where('id', '[0-9]+')
   Route.post('/registro/complete', 'UsersController.registroCompleto')
@@ -62,6 +69,15 @@ Route.group(() => {
   Route.put('/users/info/:id', 'UsersController.updateInfoUser').where('id', '[0-9]+')
   Route.post('/users/mod', 'UsersController.addUserModerador')
   Route.delete('/users/mod/:id', 'UsersController.deleteMod').where('id', '[0-9]+')
+  Route.get('/user/pregunta/:id', 'UsersController.getMyPregunta').where('id', '[0-9]+')
+  Route.post('/user/pregunta/answer' , 'UsersController.recuperacionPregunta')
+  Route.put('/user/update/password', 'UsersController.updatePassword')
+  Route.post('/user/email/phone', 'UsersController.getUserByEmailOrPhone')
+
+  Route.put('/user/update/access', 'UsersController.updateUserToken')
+  Route.put('/user/update/info', 'UsersController.updateInfoUserToken')
+  Route.put('/user/update/password/auth', 'UsersController.updatePasswordToken')
+
 })
 
 Route.group(() => {
@@ -74,6 +90,8 @@ Route.group(() => {
   Route.post('/invitacion', 'InvitacionesController.sendInvitacion')
   Route.get('/invitaciones/:id', 'InvitacionesController.misInvitaciones').where('id', '[0-9]+')
   Route.post('/invitacion/process', 'InvitacionesController.procesarInvitacion')
+  Route.get('/invitaciones/recibidas', 'InvitacionesController.misInvitacionesRecibidasToken')
+  Route.get('/invitaciones/enviadas', 'InvitacionesController.misInvitacionesEnviadasToken')
 })
 
 Route.group(() => {
