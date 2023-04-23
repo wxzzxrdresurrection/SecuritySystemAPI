@@ -100,5 +100,6 @@ Route.group(() => {
   Route.get('/sensores', 'SensorsController.allSensores')
   Route.get('/tienda/sensores/:id', 'SensorsController.getTiendaSensores')
   Route.post('/show/sensores', 'SensorsController.showSensores')
-  Route.post('/sensor/valores', 'SensorsController.getValues')
+  Route.get('/sensor/valores', 'SensorsController.getValues')
+  Route.get('/sensores/tienda/:id', 'SensorsController.getSensoresByTienda')
 })

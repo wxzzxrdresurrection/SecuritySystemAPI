@@ -2,7 +2,6 @@ services:
   db:
     image: mysql:8.0.32
     container_name: security_db
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_DATABASE: secursys
@@ -24,7 +23,6 @@ services:
 
   adonis_app:
     container_name: adonis_app
-    restart: always
     build: .
     ports:
       - ${PORT}:${PORT}
@@ -35,11 +33,10 @@ services:
     hostname: mongo1
     container_name: localmongo1
     build: ./Dockerfiles/
-    expose:
-      - 27017
+    volumes:
+      - ./data1:/data/db
     ports:
-      - 27017:27017
-    restart: always
+      - "27017:27017"
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
     environment:
       MONGO_INITDB_DATABASE: secursys
@@ -47,22 +44,21 @@ services:
     hostname: mongo2
     container_name: localmongo2
     build: ./Dockerfiles/
-    expose:
-      - 27017
+    volumes:
+      - ./data2:/data/db
     ports:
-      - 27018:27017
-    restart: always
+      - "27018:27017"
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+
 
   mongo3:
     hostname: mongo3
     container_name: localmongo3
     build: ./Dockerfiles/
-    expose:
-      - 27017
+    volumes:
+      - ./data3:/data/db
     ports:
-      - 27019:27017
-    restart: always
+      - "27019:27017"
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 
 
