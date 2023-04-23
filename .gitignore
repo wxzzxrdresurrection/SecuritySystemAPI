@@ -5,3 +5,6 @@ coverage
 .DS_STORE
 .env
 tmp
+data1
+data2
+data3
