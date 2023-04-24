@@ -1172,4 +1172,104 @@ export default class UsersController {
     return infoUsers
 
   }
+
+  public async cuentaActivada({response}: HttpContextContract){
+
+    try {
+
+      await Mail.send((message) => {
+        message
+        .from('magicwizz12@gmail.com')
+        .to('luiszapata0815@gmail.com')
+        .subject('Cuenta activada')
+        .htmlView('emails/cuenta_activada')
+      })
+
+    } catch (error) {
+
+      return response.status(500).json({
+        status: 500,
+        message: 'Error al enviar correo',
+        error: error,
+        data: null,
+      })
+
+    }
+
+  }
+
+  public async cuentaDesactivada({response}: HttpContextContract){
+
+    try {
+
+      await Mail.send((message) => {
+        message
+        .from('magicwizz12@gmail.com')
+        .to('luiszapata0815@gmail.com')
+        .subject('Cuenta Desactivada')
+        .htmlView('emails/cuenta_desactivada')
+      })
+
+    } catch (error) {
+
+      return response.status(500).json({
+        status: 500,
+        message: 'Error al enviar correo',
+        error: error,
+        data: null,
+      })
+
+    }
+
+  }
+
+  public async cuentaCreada({response}: HttpContextContract){
+
+    try {
+
+      await Mail.send((message) => {
+        message
+        .from('magicwizz12@gmail.com')
+        .to('luiszapata0815@gmail.com')
+        .subject('Cuenta Creada')
+        .htmlView('emails/cuenta_creada')
+      })
+
+    } catch (error) {
+
+      return response.status(500).json({
+        status: 500,
+        message: 'Error al enviar correo',
+        error: error,
+        data: null,
+      })
+
+    }
+
+  }
+
+  public async cuentaExitosa({response}: HttpContextContract){
+
+    try {
+
+      await Mail.send((message) => {
+        message
+        .from('magicwizz12@gmail.com')
+        .to('luiszapata0815@gmail.com')
+        .subject('Cuenta activada')
+        .htmlView('emails/cuenta_exitosa')
+      })
+
+    } catch (error) {
+
+      return response.status(500).json({
+        status: 500,
+        message: 'Error al enviar correo',
+        error: error,
+        data: null,
+      })
+
+    }
+
+  }
 }

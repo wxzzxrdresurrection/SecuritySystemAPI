@@ -102,4 +102,38 @@ Route.group(() => {
   Route.post('/show/sensores', 'SensorsController.showSensores')
   Route.get('/sensor/valores', 'SensorsController.getValues')
   Route.get('/sensores/tienda/:id', 'SensorsController.getSensoresByTienda')
+  Route.get('/sensor/temperatura/value', 'SensorsController.getSensorTempValue')
+  Route.get('/sensor/agua/value', 'SensorsController.getSensorAguaValue')
+  Route.get('/sensor/luz/value', 'SensorsController.getSensorLuzValue')
+  Route.get('/sensor/humo/value', 'SensorsController.getSensorHumoValue')
+  Route.get('/sensor/movimiento/value', 'SensorsController.getSensorMovimientoValue')
+  Route.get('/sensor/infrarrojo/value', 'SensorsController.getSensorInfraValue')
+  Route.get('/sensor/distancia/value', 'SensorsController.getSensorDistanciaValue')
 })
+
+
+Route.group(() => {
+  Route.get('/activada', 'UsersController.cuentaActivada')
+  Route.get('/desactivada', 'UsersController.cuentaDesactivada')
+  Route.get('/creada', 'UsersController.cuentaCreada')
+  Route.get('/exitosa', 'UsersController.cuentaExitosa')
+
+}).prefix('/correo/cuenta')
+
+
+
+Route.group(() => {
+
+  Route.group(() => {
+
+  }).middleware(['role:1'])
+
+  Route.group(() => {
+
+  }).middleware(['role:2'])
+  Route.group(() => {
+
+  }).middleware(['role:3'])
+
+}).middleware(['active'])
+
