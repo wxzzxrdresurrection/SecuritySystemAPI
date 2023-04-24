@@ -3,6 +3,7 @@ import Invitacione from 'App/Models/Invitacione'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { DateTime } from 'luxon'
 import UserTienda from 'App/Models/UserTienda'
+import Ws from 'App/Services/Ws'
 
 
 export default class InvitacionesController {
@@ -27,6 +28,7 @@ export default class InvitacionesController {
       }
     })
 
+    Ws.io.emit('invitacion');
     if(request.input('owner_id') === request.input('invitado_id')) {
       return response.status(400).json({
         status: 400,
@@ -142,6 +144,7 @@ export default class InvitacionesController {
 
       invitacion.delete()
 
+      Ws.io.emit('invitacion');
       return response.status(200).json({
         status: 200,
         message: 'Invitacion aceptada',
@@ -154,6 +157,7 @@ export default class InvitacionesController {
 
       invitacion.delete()
 
+      Ws.io.emit('invitacion');
       return response.status(200).json({
         status: 200,
         message: 'Invitacion rechazada',
