@@ -24,7 +24,7 @@ export default class User extends BaseModel {
   public info_user_id: number
 
   @column()
-  public estatus: number
+  public estatus: string
 
   @column()
   public pregunta_id: number

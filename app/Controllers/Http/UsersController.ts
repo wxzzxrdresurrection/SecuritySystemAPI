@@ -132,7 +132,7 @@ export default class UsersController {
 
     await user.merge({
       codigo_verificacion: codigo,
-      estatus : 1
+      estatus : "1"
     }).save()
 
     const ruta = Route.makeSignedUrl('codigo',{id: user.id}, {expiresIn: '1h', prefixUrl: Env.get('APP_URL')})
@@ -190,17 +190,21 @@ export default class UsersController {
       })
     }
 
-    if (user.estatus === 0) {
+    if (user.estatus === "0") {
 
-      const ruta = Route.makeSignedUrl('sendSMS', {params: {id: user.id}})
+      const codigo = Math.floor(Math.random() * 9000 + 1000).toString()
+
+      await user.merge({
+        codigo_verificacion: codigo,
+      }).save()
 
       try{
         await Mail.send((message) => {
           message
             .from('magicwizz12@gmail.com')
-            .to(request.input('correo'))
+            .to(user.correo)
             .subject('Activacion de cuenta')
-            .htmlView('emails/activacion', {user : user, ruta: ruta})
+            .htmlView('emails/cuenta_activada', {user : user, codigo: codigo})
         })
       }
       catch(error){
@@ -715,7 +719,7 @@ export default class UsersController {
         password: await Hash.make(request.input('password')),
         telefono: request.input('telefono'),
         rol_id: 2,
-        estatus: 2,
+        estatus: "2",
       })
 
       if(!user){
@@ -823,9 +827,9 @@ export default class UsersController {
       })
     }
 
-    if(user.estatus !== 2){
+    if(user.estatus !== "2"){
       await user.merge({
-        estatus: 3
+        estatus: "3"
     }).save()
     }
 
