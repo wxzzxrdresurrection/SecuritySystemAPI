@@ -5,6 +5,7 @@ import Tienda from 'App/Models/Tienda'
 import UserTienda from 'App/Models/UserTienda'
 import Invitacione from 'App/Models/Invitacione'
 import { DateTime } from 'luxon'
+import Ws from 'App/Services/Ws'
 
 export default class TiendaUsersController {
 
@@ -57,6 +58,7 @@ export default class TiendaUsersController {
       })
     }
 
+    Ws.io.emit('tienda');
     return response.status(201).json({
       status: 201,
       message: 'Usuario agregado a la tienda correctamente',
@@ -82,10 +84,9 @@ export default class TiendaUsersController {
     return invitados;
   }
 
-  public async getOwners({response, auth}: HttpContextContract){
-    const user = await auth.use('api').authenticate()
+  public async getOwners({response}: HttpContextContract){
 
-    const owners = await UserTienda.query().where('user_id', user.id).andWhere('is_owner', true)
+    const owners = await UserTienda.query().where('is_owner', true)
 
     if(!owners){
       return response.status(404).json({
@@ -195,6 +196,7 @@ export default class TiendaUsersController {
       await invitado.delete()
     }
 
+    Ws.io.emit('tienda');
     return response.status(200).json({
       status: 200,
       message: 'Invitados eliminados correctamente',
@@ -224,7 +226,7 @@ export default class TiendaUsersController {
   public async misTiendasToken({auth, response}: HttpContextContract){
     const user = await auth.use('api').authenticate()
 
-    const tiendas = await UserTienda.query().where('user_id', user.id).andWhere('is_owner', true)
+    const tiendas = await UserTienda.query().where('user_id', user.id)
 
     if(!tiendas){
       return response.status(404).json({
@@ -310,6 +312,7 @@ export default class TiendaUsersController {
       fecha: DateTime.now().toFormat('yyyy-MM-dd'),
     })
 
+    Ws.io.emit('tienda');
     return response.status(201).json({
       status: 201,
       message: 'Invitación enviada correctamente',
