@@ -7,6 +7,7 @@ import Pregunta from 'App/Models/Pregunta'
 import Mail from '@ioc:Adonis/Addons/Mail'
 import Env from '@ioc:Adonis/Core/Env'
 import Route from '@ioc:Adonis/Core/Route'
+import Ws from 'App/Services/Ws'
 const { Vonage } = require('@vonage/server-sdk')
 
 export default class UsersController {
@@ -464,6 +465,7 @@ export default class UsersController {
       })
     }
 
+    Ws.io.emit('usuario', user);
     return response.status(201).json({
       status: 201,
       message: 'Usuario creado correctamente',
@@ -555,6 +557,7 @@ export default class UsersController {
     await user.delete()
     await infoUser.delete()
 
+    Ws.io.emit('usuario', user);
     return response.status(200).json({
       status: 200,
       message: 'Usuario eliminado correctamente',
@@ -578,6 +581,7 @@ export default class UsersController {
 
     await user.delete()
 
+    Ws.io.emit('moderador', user);
     return response.status(200).json({
       status: 200,
       message: 'Usuario eliminado correctamente',
@@ -616,6 +620,8 @@ export default class UsersController {
       })
     }
 
+    Ws.io.emit('usuario', updatedUser);
+    Ws.io.emit('moderador', updatedUser);
     return response.status(200).json({
       status: 200,
       message: 'Usuario actualizado correctamente',
@@ -651,6 +657,8 @@ export default class UsersController {
       })
     }
 
+    Ws.io.emit('usuario', updatedUser);
+    Ws.io.emit('moderador', updatedUser);
     return response.status(200).json({
       status: 200,
       message: 'Usuario actualizado correctamente',
@@ -690,6 +698,7 @@ export default class UsersController {
       })
     }
 
+    Ws.io.emit('usuario', updatedInfoUser);
     return response.status(200).json({
       status: 200,
       message: 'Informacion de Usuario actualizada correctamente',
@@ -718,6 +727,7 @@ export default class UsersController {
         })
       }
 
+      Ws.io.emit('moderador', user);
       return response.status(201).json({
         status: 201,
         message: 'Usuario creado correctamente',

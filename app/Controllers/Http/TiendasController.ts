@@ -4,6 +4,7 @@ import Tienda from 'App/Models/Tienda'
 import TiendaMongo from 'App/Models/TiendaMongo'
 import User from 'App/Models/User'
 import UserTienda from 'App/Models/UserTienda'
+import Ws from 'App/Services/Ws'
 
 export default class TiendasController {
   //CALADO
@@ -47,6 +48,7 @@ export default class TiendasController {
       is_owner: true,
     })
 
+    Ws.io.emit('tienda', tienda);
     return response.status(201).created({
       status: 201,
       message: 'Tienda creada correctamente',
@@ -150,6 +152,7 @@ export default class TiendasController {
       await sameTiendaUser.delete()
     }
 
+    Ws.io.emit('tienda', tienda);
     return response.status(200).json({
       status: 200,
       message: 'Tienda actualizada correctamente',
@@ -172,6 +175,7 @@ export default class TiendasController {
 
     await tienda.delete()
 
+    Ws.io.emit('tienda', tienda);
     return response.status(200).json({
       status: 200,
       message: 'Tienda eliminada correctamente',

@@ -3,6 +3,7 @@ import Peticione from 'App/Models/Peticione'
 import { schema } from '@ioc:Adonis/Core/Validator'
 import { DateTime } from 'luxon'
 import User from 'App/Models/User'
+import Ws from 'App/Services/Ws'
 
 export default class PeticionesController {
   public async createPeticion({request, response} : HttpContextContract){
@@ -31,6 +32,7 @@ export default class PeticionesController {
       })
     }
 
+    Ws.io.emit('peticion', peticion);
     return response.status(201).json({
       status: 201,
       message: 'Peticion creada correctamente',
@@ -103,6 +105,7 @@ export default class PeticionesController {
         }
       }
 
+      Ws.io.emit('peticion', peticion);
       return response.status(200).json({
         status: 200,
         message: 'Peticion actualizada correctamente',
