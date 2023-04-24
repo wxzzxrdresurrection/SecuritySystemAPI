@@ -92,7 +92,7 @@ export default class PeticionesController {
         }
 
         const updatedUser = await user.merge({
-          estatus: 3
+          estatus: "3"
         }).save()
 
         if(!updatedUser){
