@@ -211,8 +211,8 @@ export default class UsersController {
         console.log(error)
       }
 
-      return response.status(404).json({
-        status: 404,
+      return response.status(200).json({
+        status: 200,
         message: 'Si deseas activar tu cuenta, contacte con un adminstrador',
         error: 'Usuario desactivado',
         data: null,
