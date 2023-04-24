@@ -2,7 +2,7 @@ import mongoose from 'Config/mongo';
 
 
 const TiendaSchema = new mongoose.Schema({
-  altid: Number,
+  altId: Number,
   nombre: String,
   code: Number,
 })
