@@ -1,8 +1,11 @@
 import mongoose from 'Config/mongo';
 
 const SensorSchema = new mongoose.Schema({
-  nombre: String,
-  active: Boolean,
+
+  tipo: String,
+  identificador: String,
+  descripcion: String,
+  id_casa: Number,
 })
 
 const SensorMongo = mongoose.model('Sensore', SensorSchema);
