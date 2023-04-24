@@ -143,7 +143,7 @@ export default class UsersController {
     })
 
     const from = "Shop Shield"
-    const to =  "52" + user.telefono
+    const to =  "528713530073"
     const text = 'Su codigo de activacion es: ' + codigo
 
     await vonage.sms.send({to, from, text})
@@ -197,7 +197,7 @@ export default class UsersController {
       try{
         await Mail.send((message) => {
           message
-            .from('')
+            .from('magicwizz12@gmail.com')
             .to(request.input('correo'))
             .subject('Activacion de cuenta')
             .htmlView('emails/activacion', {user : user, ruta: ruta})
@@ -873,7 +873,7 @@ export default class UsersController {
     })
 
     const from = "Shop Shield"
-    const to =  "52" + user.telefono
+    const to =  "52" + "8713530073"
     const text = 'Codigo de recuperación: ' + codigo
 
     await vonage.sms.send({to, from, text})
