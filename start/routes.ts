@@ -82,35 +82,6 @@ Route.group(() => {
 
 })
 
-Route.group(() => {
-  Route.post('/peticion', 'PeticionesController.createPeticion')
-  Route.get('/peticiones', 'PeticionesController.getPeticiones')
-  Route.put('/peticion/status/:id', 'PeticionesController.statusPeticion').where('id', '[0-9]+')
-})
-
-Route.group(() => {
-  Route.post('/invitacion', 'InvitacionesController.sendInvitacion')
-  Route.get('/invitaciones/:id', 'InvitacionesController.misInvitaciones').where('id', '[0-9]+')
-  Route.post('/invitacion/process', 'InvitacionesController.procesarInvitacion')
-  Route.get('/invitaciones/recibidas', 'InvitacionesController.misInvitacionesRecibidasToken')
-  Route.get('/invitaciones/enviadas', 'InvitacionesController.misInvitacionesEnviadasToken')
-})
-
-Route.group(() => {
-  Route.get('/sensores', 'SensorsController.allSensores')
-  Route.get('/tienda/sensores/:id', 'SensorsController.getTiendaSensores')
-  Route.post('/show/sensores', 'SensorsController.showSensores')
-  Route.get('/sensor/valores', 'SensorsController.getValues')
-  Route.get('/sensores/tienda/:id', 'SensorsController.getSensoresByTienda')
-  Route.post('/sensor/temperatura/value', 'SensorsController.getSensorTempValue')
-  Route.post('/sensor/agua/value', 'SensorsController.getSensorAguaValue')
-  Route.post('/sensor/luz/value', 'SensorsController.getSensorLuzValue')
-  Route.post('/sensor/humo/value', 'SensorsController.getSensorHumoValue')
-  Route.post('/sensor/movimiento/value', 'SensorsController.getSensorMovimientoValue')
-  Route.post('/sensor/infrarrojo/value', 'SensorsController.getSensorInfraValue')
-  Route.post('/sensor/distancia/value', 'SensorsController.getSensorDistanciaValue')
-})
-
 
 Route.group(() => {
   Route.get('/activada', 'UsersController.cuentaActivada')
@@ -121,18 +92,35 @@ Route.group(() => {
 }).prefix('/correo/cuenta')
 
 
-
 Route.group(() => {
 
   Route.group(() => {
-
+    Route.get('/sensores', 'SensorsController.allSensores')
+    Route.get('/tienda/sensores/:id', 'SensorsController.getTiendaSensores')
+    Route.post('/show/sensores', 'SensorsController.showSensores')
+    Route.get('/sensor/valores', 'SensorsController.getValues')
+    Route.get('/sensores/tienda/:id', 'SensorsController.getSensoresByTienda')
+    Route.post('/sensor/temperatura/value', 'SensorsController.getSensorTempValue')
+    Route.post('/sensor/agua/value', 'SensorsController.getSensorAguaValue')
+    Route.post('/sensor/luz/value', 'SensorsController.getSensorLuzValue')
+    Route.post('/sensor/humo/value', 'SensorsController.getSensorHumoValue')
+    Route.post('/sensor/movimiento/value', 'SensorsController.getSensorMovimientoValue')
+    Route.post('/sensor/infrarrojo/value', 'SensorsController.getSensorInfraValue')
+    Route.post('/sensor/distancia/value', 'SensorsController.getSensorDistanciaValue')
+    Route.post('/peticion', 'PeticionesController.createPeticion')
   }).middleware(['role:1'])
 
   Route.group(() => {
-
-  }).middleware(['role:2'])
+    Route.post('/invitacion', 'InvitacionesController.sendInvitacion')
+    Route.get('/invitaciones/:id', 'InvitacionesController.misInvitaciones').where('id', '[0-9]+')
+    Route.post('/invitacion/process', 'InvitacionesController.procesarInvitacion')
+    Route.get('/invitaciones/recibidas', 'InvitacionesController.misInvitacionesRecibidasToken')
+    Route.get('/invitaciones/enviadas', 'InvitacionesController.misInvitacionesEnviadasToken')
+  }).middleware(['role:2,1'])
   Route.group(() => {
 
+    Route.get('/peticiones', 'PeticionesController.getPeticiones')
+    Route.put('/peticion/status/:id', 'PeticionesController.statusPeticion').where('id', '[0-9]+')
   }).middleware(['role:3'])
 
 }).middleware(['active'])
